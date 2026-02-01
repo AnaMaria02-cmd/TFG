@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Sockets;
 using UnityEngine;
 
 public class DropAndDrag : MonoBehaviour
@@ -25,13 +26,32 @@ public class DropAndDrag : MonoBehaviour
         // Si está ensamblada → desensamblar
         if (isAttached)
         {
+            // Liberar socket anterior
+            Socket socket = attachedNode.GetComponent<Socket>();
+            if (socket != null)
+                socket.isOccupied = false;
+
+            // Desparentar
             transform.SetParent(null, true);
+
+            // Desactivar todos los sockets de la pieza
+            Socket[] childSockets = GetComponentsInChildren<Socket>(true);
+            foreach (Socket s in childSockets)
+            {
+                s.gameObject.SetActive(false);
+                s.isOccupied = false;
+            }
+
+            // Reset estado
             attachedNode = null;
             isAttached = false;
         }
 
+        // Calcular offset para drag
         mouseOffset = transform.position - GetMouseWorldPos();
     }
+
+
 
     private void OnMouseDrag()
     {
@@ -45,30 +65,51 @@ public class DropAndDrag : MonoBehaviour
     {
         if (isAttached) return;
 
+        Socket closestSocket = null;
         float smallestDistance = snapDistance;
-        Transform closestNode = null;
 
-        foreach (Transform node in nodes)
+        foreach (Socket socket in FindObjectsOfType<Socket>())
         {
-            float distance = Vector3.Distance(node.position, worldPosition);
-            if (distance < smallestDistance)
+            if (socket.isOccupied) continue;
+
+            float d = Vector3.Distance(socket.transform.position, worldPosition);
+            if (d < smallestDistance)
             {
-                smallestDistance = distance;
-                closestNode = node;
+                smallestDistance = d;
+                closestSocket = socket;
             }
         }
 
-        if (closestNode != null)
+        if (closestSocket != null)
         {
             // Snap exacto
-            transform.position = closestNode.position;
-            transform.rotation = closestNode.rotation;
+            transform.position = closestSocket.transform.position;
+            transform.rotation = closestSocket.transform.rotation;
 
-            // Parentado CORRECTO
-            transform.SetParent(closestNode, true);
+            // Parent correcto
+            transform.SetParent(closestSocket.transform, true);
 
-            attachedNode = closestNode;
+            // Marcar socket pegado como ocupado
+            closestSocket.isOccupied = true;
+
+            // Activar todos los sockets de la nueva pieza
+            Socket[] childSockets = GetComponentsInChildren<Socket>(true);
+            foreach (Socket s in childSockets)
+            {
+                if (s.transform != closestSocket.transform) // no reactivar el socket donde pegaste
+                {
+                    Debug.Log("activando");
+                    s.gameObject.SetActive(true);
+                    s.isOccupied = false;
+                }
+            }
+
+            // Estado de la pieza
+            attachedNode = closestSocket.transform;
             isAttached = true;
         }
+
     }
+
 }
+
