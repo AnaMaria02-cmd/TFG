@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - AttachPoint
+  - Cilindro
+  - AttachedPiece
   layers:
   - Default
   - TransparentFX
@@ -13,8 +15,8 @@ TagManager:
   - Water
   - UI
   - EditorCharacter
-  - 
-  - 
+  - Player
+  - AttachedPiece
   - 
   - 
   - 
