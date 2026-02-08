@@ -4,7 +4,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public float speed = 5f;
     public float jumpForce = 6f;
-    public float groundCheckDistance = 0.6f;
+    public float groundCheckDistance = 0.2f;
 
     private Rigidbody rb;
     private float moveX;
@@ -18,14 +18,16 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Movimiento
         moveX = Input.GetAxis("Horizontal");
         moveZ = Input.GetAxis("Vertical");
 
-        // Check suelo (raycast hacia abajo)
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance);
+        // Raycast desde un poco más abajo
+        isGrounded = Physics.Raycast(
+            transform.position + Vector3.up * 0.1f,
+            Vector3.down,
+            groundCheckDistance
+        );
 
-        // Salto
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -34,13 +36,9 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 movement = new Vector3(moveX, 0f, moveZ) * speed;
-
-        rb.linearVelocity = new Vector3(
-            movement.x,
-            rb.linearVelocity.y,
-            movement.z
-        );
-
+        Vector3 velocity = rb.linearVelocity;
+        velocity.x = moveX * speed;
+        velocity.z = moveZ * speed;
+        rb.linearVelocity = velocity;
     }
 }
