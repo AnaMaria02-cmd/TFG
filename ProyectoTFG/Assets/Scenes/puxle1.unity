@@ -1231,7 +1231,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 46
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1392,7 +1392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.7968034
+      value: 1.4554107
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalScale.y
@@ -1404,7 +1404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -16.3
+      value: -14.03
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2094,7 +2094,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.7968034
+      value: 1.4554107
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalScale.y
@@ -2106,7 +2106,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.55
+      value: 8.72
       objectReference: {fileID: 0}
     - target: {fileID: 8820339441942790152, guid: 26d5a529d52f94049b9ff5d865a5cfbe, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3726,7 +3726,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &1526215006
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3740,14 +3740,14 @@ MeshRenderer:
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 4
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 1781725196}
@@ -3941,6 +3941,22 @@ PrefabInstance:
     - target: {fileID: 4724963993530749383, guid: 75a7cd3c7708fcf43bdf2654ba809238, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 18.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 7164977765711146325, guid: 75a7cd3c7708fcf43bdf2654ba809238, type: 3}
+      propertyPath: m_CastShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7164977765711146325, guid: 75a7cd3c7708fcf43bdf2654ba809238, type: 3}
+      propertyPath: m_MotionVectors
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7164977765711146325, guid: 75a7cd3c7708fcf43bdf2654ba809238, type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7164977765711146325, guid: 75a7cd3c7708fcf43bdf2654ba809238, type: 3}
+      propertyPath: m_RenderingLayerMask
+      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4837,7 +4853,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _Metallic: 0.28
+    - _Metallic: 0.204
     - _Normal_strenght: 0.2
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -4849,7 +4865,7 @@ Material:
     - _Rim_strenght: 31.8
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _Smouthness: 1
+    - _Smouthness: 0.214
     - _SpecularHighlights: 1
     - _SrcBlend: 2
     - _SrcBlendAlpha: 1
@@ -4898,8 +4914,8 @@ Material:
     - _Vector4: {r: 0, g: 0, b: 0, a: 0}
     - _Wave_Direction: {r: 0.5, g: 0.1, b: 0, a: 0}
     - _Waves_direction: {r: 1, g: 1, b: 1, a: 0}
-    - _deep_water_color: {r: 0.083659664, g: 0.3773585, b: 0.35439774, a: 1}
-    - _foam_color: {r: 1, g: 1, b: 1, a: 1}
+    - _deep_water_color: {r: 0.30726233, g: 0.5104248, b: 0.5169811, a: 1}
+    - _foam_color: {r: 1, g: 1, b: 1, a: 0.15294118}
     - _shallow_water_color: {r: 0.26272696, g: 0.4528302, b: 0.42330298, a: 0.2784314}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
@@ -6107,6 +6123,7 @@ SceneRoots:
   - {fileID: 468371296}
   - {fileID: 666010251}
   - {fileID: 1304045383}
+  - {fileID: 1526215009}
   - {fileID: 1623668977}
   - {fileID: 519502696}
   - {fileID: 710278229}
@@ -6123,4 +6140,3 @@ SceneRoots:
   - {fileID: 187058818}
   - {fileID: 1730526829}
   - {fileID: 2045610257}
-  - {fileID: 1526215009}
