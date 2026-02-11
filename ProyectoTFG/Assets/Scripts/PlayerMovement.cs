@@ -37,13 +37,13 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 movement = new Vector3(moveX, 0f, moveZ);
-        
+        /*
         // Rotación
         if (movement.magnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(movement);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, speed * Time.fixedDeltaTime);
-        }
+        }*/
 
         rb.linearVelocity = new Vector3(
             movement.x * speed,

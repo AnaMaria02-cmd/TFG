@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net.Sockets;
 using UnityEngine;
 
 public class DropAndDrag : MonoBehaviour
@@ -12,29 +11,57 @@ public class DropAndDrag : MonoBehaviour
     public Transform playerTransform;
 
     bool isAttached = false;
+    bool isSelected = false;
     Transform attachedNode;
 
-    private Vector3 GetMouseWorldPos()
+    private Plane dragPlane;
+    private Camera cam;
+
+    private void Start()
     {
-        Vector3 mousePoint = Input.mousePosition;
-        mousePoint.z = Camera.main.WorldToScreenPoint(transform.position).z;
-        return Camera.main.ScreenToWorldPoint(mousePoint);
+        cam = Camera.main;
+    }
+
+    private void Update()
+    {
+        // Rotación solo si está seleccionada
+        if (isSelected && Input.GetMouseButtonDown(1))
+        {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            {
+                // Rotar en eje X
+                transform.Rotate(90f, 0f, 0f, Space.World);
+            }
+            else
+            {
+                // Rotar en eje Y
+                transform.Rotate(0f, 90f, 0f, Space.World);
+            }
+        }
     }
 
     private void OnMouseDown()
     {
+        isSelected = true;
+
+        // Crear plano perpendicular al eje Z (bloquea movimiento en Z)
+        dragPlane = new Plane(Vector3.forward, transform.position);
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (dragPlane.Raycast(ray, out float distance))
+        {
+            mouseOffset = transform.position - ray.GetPoint(distance);
+        }
+
         // Si está ensamblada → desensamblar
         if (isAttached)
         {
-            // Liberar socket anterior
             Socket socket = attachedNode.GetComponent<Socket>();
             if (socket != null)
                 socket.isOccupied = false;
 
-            // Desparentar
             transform.SetParent(null, true);
 
-            // Desactivar todos los sockets de la pieza
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
             {
@@ -42,27 +69,29 @@ public class DropAndDrag : MonoBehaviour
                 s.isOccupied = false;
             }
 
-            // Reset estado
             attachedNode = null;
             isAttached = false;
         }
-
-        // Calcular offset para drag
-        mouseOffset = transform.position - GetMouseWorldPos();
     }
-
-
 
     private void OnMouseDrag()
     {
         if (isAttached) return;
 
-        worldPosition = GetMouseWorldPos() + mouseOffset;
-        transform.position = worldPosition;
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+        if (dragPlane.Raycast(ray, out float distance))
+        {
+            Vector3 point = ray.GetPoint(distance);
+            transform.position = point + mouseOffset;
+            worldPosition = transform.position;
+        }
     }
 
     private void OnMouseUp()
     {
+        isSelected = false;
+
         if (isAttached) return;
 
         Socket closestSocket = null;
@@ -89,27 +118,22 @@ public class DropAndDrag : MonoBehaviour
             // Parent correcto
             transform.SetParent(closestSocket.transform, true);
 
-            // Marcar socket pegado como ocupado
+            // Marcar socket como ocupado
             closestSocket.isOccupied = true;
 
-            // Activar todos los sockets de la nueva pieza
+            // Activar sockets hijos
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
             {
-                if (s.transform != closestSocket.transform) // no reactivar el socket donde pegaste
+                if (s.transform != closestSocket.transform)
                 {
-                    Debug.Log("activando");
                     s.gameObject.SetActive(true);
                     s.isOccupied = false;
                 }
             }
 
-            // Estado de la pieza
             attachedNode = closestSocket.transform;
             isAttached = true;
         }
-
     }
-
 }
-
