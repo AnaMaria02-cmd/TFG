@@ -10,6 +10,8 @@ public class DropAndDrag : MonoBehaviour
     public List<Transform> nodes = new List<Transform>();
     public Transform playerTransform;
 
+    public static bool IsDraggingAnyPiece = false; // New static flag
+
     bool isAttached = false;
     bool isSelected = false;
     Transform attachedNode;
@@ -41,6 +43,7 @@ public class DropAndDrag : MonoBehaviour
     private void OnMouseDown()
     {
         isSelected = true;
+        IsDraggingAnyPiece = true; // Set flag
 
         // Plano que bloquea eje Z
         dragPlane = new Plane(Vector3.forward, transform.position);
@@ -89,6 +92,7 @@ public class DropAndDrag : MonoBehaviour
     private void OnMouseUp()
     {
         isSelected = false;
+        IsDraggingAnyPiece = false; // Reset flag
 
         if (isAttached) return;
 
