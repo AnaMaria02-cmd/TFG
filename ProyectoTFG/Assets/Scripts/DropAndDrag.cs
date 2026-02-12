@@ -29,12 +29,10 @@ public class DropAndDrag : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             {
-                // Rotar en eje X
                 transform.Rotate(90f, 0f, 0f, Space.World);
             }
             else
             {
-                // Rotar en eje Y
                 transform.Rotate(0f, 90f, 0f, Space.World);
             }
         }
@@ -44,7 +42,7 @@ public class DropAndDrag : MonoBehaviour
     {
         isSelected = true;
 
-        // Crear plano perpendicular al eje Z (bloquea movimiento en Z)
+        // Plano que bloquea eje Z
         dragPlane = new Plane(Vector3.forward, transform.position);
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -53,7 +51,7 @@ public class DropAndDrag : MonoBehaviour
             mouseOffset = transform.position - ray.GetPoint(distance);
         }
 
-        // Si está ensamblada → desensamblar
+        // Si estaba ensamblada → desensamblar
         if (isAttached)
         {
             Socket socket = attachedNode.GetComponent<Socket>();
@@ -95,33 +93,42 @@ public class DropAndDrag : MonoBehaviour
         if (isAttached) return;
 
         Socket closestSocket = null;
-        float smallestDistance = snapDistance;
 
-        foreach (Socket socket in FindObjectsOfType<Socket>())
+        // 🔹 USAR SOCKET MANAGER (forma correcta)
+        if (SocketManager.Instance != null)
         {
-            if (socket.isOccupied) continue;
+            closestSocket = SocketManager.Instance.GetClosestSocket(worldPosition, snapDistance);
+        }
+        else
+        {
+            // 🔹 Fallback por si no existe el manager
+            float smallestDistance = snapDistance;
 
-            float d = Vector3.Distance(socket.transform.position, worldPosition);
-            if (d < smallestDistance)
+            foreach (Socket socket in FindObjectsOfType<Socket>())
             {
-                smallestDistance = d;
-                closestSocket = socket;
+                if (socket == null || socket.isOccupied || !socket.gameObject.activeInHierarchy)
+                    continue;
+
+                float d = Vector3.Distance(socket.transform.position, worldPosition);
+
+                if (d < smallestDistance)
+                {
+                    smallestDistance = d;
+                    closestSocket = socket;
+                }
             }
         }
 
+        // 🔹 Si encontramos socket válido
         if (closestSocket != null)
         {
-            // Snap exacto
             transform.position = closestSocket.transform.position;
             transform.rotation = closestSocket.transform.rotation;
 
-            // Parent correcto
             transform.SetParent(closestSocket.transform, true);
 
-            // Marcar socket como ocupado
             closestSocket.isOccupied = true;
 
-            // Activar sockets hijos
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
             {

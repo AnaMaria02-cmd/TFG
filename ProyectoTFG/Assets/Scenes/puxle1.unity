@@ -724,7 +724,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -783,28 +783,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216853190}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!95 &216853195
-Animator:
-  serializedVersion: 7
+--- !u!114 &216853195
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216853190}
   m_Enabled: 1
-  m_Avatar: {fileID: 2076828875}
-  m_Controller: {fileID: 9100000, guid: a9ba623c7d5f3d548b753bd85f262fd2, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44206edafcef98d4dba9a279a8c43917, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPressed: 0
+  buttonTop: {fileID: 216853191}
+  pressDistance: 0.1
+  pressSpeed: 5
+  playerTransform: {fileID: 1095468229}
 --- !u!1 &224725366
 GameObject:
   m_ObjectHideFlags: 0
@@ -817,6 +812,7 @@ GameObject:
   - component: {fileID: 224725370}
   - component: {fileID: 224725369}
   - component: {fileID: 224725368}
+  - component: {fileID: 224725371}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -854,7 +850,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -913,6 +909,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 224725366}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &224725371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224725366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44206edafcef98d4dba9a279a8c43917, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isPressed: 0
+  buttonTop: {fileID: 224725367}
+  pressDistance: 0.1
+  pressSpeed: 5
+  playerTransform: {fileID: 1095468229}
 --- !u!4 &235921671 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9080817077078113841, guid: 0fae4229eea635b4ea084c6aa2c38cce, type: 3}
@@ -1277,8 +1290,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3365656874753270360, guid: 1b64ead0580e4124896ae6b7040d6de0, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3365656874753270360, guid: 1b64ead0580e4124896ae6b7040d6de0, type: 3}
       propertyPath: m_Constraints
       value: 126
+      objectReference: {fileID: 0}
+    - target: {fileID: 3365656874753270360, guid: 1b64ead0580e4124896ae6b7040d6de0, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3868296448226812989, guid: 1b64ead0580e4124896ae6b7040d6de0, type: 3}
       propertyPath: m_IsActive
@@ -2190,6 +2211,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 674557748}
+  - component: {fileID: 674557749}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -2212,6 +2234,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &674557749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674557747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 788482db6763f6b4e95eb576851c8b45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &679779597
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4244,6 +4278,7 @@ GameObject:
   - component: {fileID: 1526215008}
   - component: {fileID: 1526215007}
   - component: {fileID: 1526215006}
+  - component: {fileID: 1526215010}
   m_Layer: 0
   m_Name: Water Surface
   m_TagString: Untagged
@@ -4341,6 +4376,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1526215010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526215005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8fd3441ebebe8f44b2ec1dc74d97559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button1: {fileID: 224725371}
+  button2: {fileID: 216853195}
+  waterSurface: {fileID: 1526215009}
+  targetY: 0
+  moveSpeed: 2
+  returnToOriginalHeight: 1
 --- !u!1001 &1541848062
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6286,129 +6339,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3632992466566013149, guid: 9a9be2c5ee8115d4f8d2408a3629aa8f, type: 3}
   m_PrefabInstance: {fileID: 504503395}
   m_PrefabAsset: {fileID: 0}
---- !u!90 &2076828875
-Avatar:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Automatic Avatar
-  m_AvatarSize: 500
-  m_Avatar:
-    serializedVersion: 3
-    m_AvatarSkeleton:
-      data:
-        m_Node:
-        - m_ParentId: -1
-          m_AxesId: -1
-        m_ID: 00000000
-        m_AxesArray: []
-    m_AvatarSkeletonPose:
-      data:
-        m_X:
-        - t: {x: 0, y: 0.62826407, z: 0}
-          q: {x: -0, y: -0, z: -0, w: 1}
-          s: {x: 0.67473, y: 1.1945711, z: 0.67473}
-    m_DefaultPose:
-      data:
-        m_X:
-        - t: {x: 0, y: 0.62826407, z: 0}
-          q: {x: -0, y: -0, z: -0, w: 1}
-          s: {x: 0.67473, y: 1.1945711, z: 0.67473}
-    m_SkeletonNameIDArray: 00000000
-    m_Human:
-      data:
-        serializedVersion: 2
-        m_RootX:
-          t: {x: 0, y: 0, z: 0}
-          q: {x: 0, y: 0, z: 0, w: 1}
-          s: {x: 1, y: 1, z: 1}
-        m_Skeleton:
-          data:
-            m_Node: []
-            m_ID: 
-            m_AxesArray: []
-        m_SkeletonPose:
-          data:
-            m_X: []
-        m_LeftHand:
-          data:
-            m_HandBoneIndex: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        m_RightHand:
-          data:
-            m_HandBoneIndex: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        m_HumanBoneIndex: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        m_HumanBoneMass:
-        - 0.14545456
-        - 0.12121213
-        - 0.12121213
-        - 0.048484854
-        - 0.048484854
-        - 0.009696971
-        - 0.009696971
-        - 0.030303033
-        - 0.14545456
-        - 0.14545456
-        - 0.012121214
-        - 0.048484854
-        - 0.006060607
-        - 0.006060607
-        - 0.024242427
-        - 0.024242427
-        - 0.01818182
-        - 0.01818182
-        - 0.006060607
-        - 0.006060607
-        - 0.0024242427
-        - 0.0024242427
-        - 0
-        - 0
-        - 0
-        m_Scale: 1
-        m_ArmTwist: 0.5
-        m_ForeArmTwist: 0.5
-        m_UpperLegTwist: 0.5
-        m_LegTwist: 0.5
-        m_ArmStretch: 0.05
-        m_LegStretch: 0.05
-        m_FeetSpacing: 0
-        m_HasLeftHand: 0
-        m_HasRightHand: 0
-        m_HasTDoF: 0
-    m_HumanSkeletonIndexArray: 
-    m_HumanSkeletonReverseIndexArray: 
-    m_RootMotionBoneIndex: -1
-    m_RootMotionBoneX:
-      t: {x: 0, y: 0, z: 0}
-      q: {x: 0, y: 0, z: 0, w: 1}
-      s: {x: 1, y: 1, z: 1}
-    m_RootMotionSkeleton:
-      data:
-        m_Node: []
-        m_ID: 
-        m_AxesArray: []
-    m_RootMotionSkeletonPose:
-      data:
-        m_X: []
-    m_RootMotionSkeletonIndexArray: 
-  m_TOS:
-    0: 
-  m_HumanDescription:
-    serializedVersion: 3
-    m_Human: []
-    m_Skeleton: []
-    m_ArmTwist: 0.5
-    m_ForeArmTwist: 0.5
-    m_UpperLegTwist: 0.5
-    m_LegTwist: 0.5
-    m_ArmStretch: 0.05
-    m_LegStretch: 0.05
-    m_FeetSpacing: 0
-    m_GlobalScale: 1
-    m_RootMotionBoneName: 
-    m_HasTranslationDoF: 0
-    m_HasExtraRoot: 0
-    m_SkeletonHasParents: 1
 --- !u!4 &2118470589 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9080817077078113841, guid: 0fae4229eea635b4ea084c6aa2c38cce, type: 3}
