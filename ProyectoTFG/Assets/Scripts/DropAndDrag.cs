@@ -18,12 +18,12 @@ public class DropAndDrag : MonoBehaviour
 
     private Plane dragPlane;
     private Camera cam;
-    private Rigidbody rb;
+   // private Rigidbody rb;
 
     private void Start()
     {
         cam = Camera.main;
-        rb = GetComponent<Rigidbody>();
+        //rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
@@ -47,7 +47,7 @@ public class DropAndDrag : MonoBehaviour
         isSelected = true;
         IsDraggingAnyPiece = true; // Set flag
 
-        if (rb != null) rb.isKinematic = true;
+        //if (rb != null) rb.isKinematic = true;
 
         // Plano que bloquea eje Z
         dragPlane = new Plane(Vector3.forward, transform.position);
@@ -98,7 +98,7 @@ public class DropAndDrag : MonoBehaviour
         isSelected = false;
         IsDraggingAnyPiece = false; // Reset flag
 
-        if (rb != null) rb.isKinematic = false;
+       // if (rb != null) rb.isKinematic = false;
 
         if (isAttached) return;
 
@@ -153,4 +153,10 @@ public class DropAndDrag : MonoBehaviour
             isAttached = true;
         }
     }
+    public void OnChildClicked()
+    {
+        Debug.Log("Click recibido desde hijo");
+        // Aquí pones lo que hacía OnMouseDown
+    }
+
 }
