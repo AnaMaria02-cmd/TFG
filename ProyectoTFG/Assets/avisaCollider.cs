@@ -1,16 +1,13 @@
 using UnityEngine;
 
-public class avisaCollider : MonoBehaviour
+public class ChildClickForwarder : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void OnMouseDown()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        var parentScript = GetComponentInParent<DropAndDrag>();
+        if (parentScript != null)
+        {
+            parentScript.OnChildClicked();
+        }
     }
 }

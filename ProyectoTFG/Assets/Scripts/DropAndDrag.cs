@@ -18,14 +18,21 @@ public class DropAndDrag : MonoBehaviour
 
     private Plane dragPlane;
     private Camera cam;
-   // private Rigidbody rb;
+    private Rigidbody rb;
 
     private void Start()
     {
         cam = Camera.main;
-        //rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
+        // Si empieza suelta, activar física normal
+        if (rb != null && !isAttached)
+            rb.isKinematic = false;
+
+        // Las piezas no deben bloquear ni empujar al jugador
+      
     }
 
+   
     private void Update()
     {
         // Rotación solo si está seleccionada
@@ -47,7 +54,8 @@ public class DropAndDrag : MonoBehaviour
         isSelected = true;
         IsDraggingAnyPiece = true; // Set flag
 
-        //if (rb != null) rb.isKinematic = true;
+        // Al coger la pieza: kinematic para que no choque mientras se arrastra
+        if (rb != null) rb.isKinematic = true;
 
         // Plano que bloquea eje Z
         dragPlane = new Plane(Vector3.forward, transform.position);
@@ -65,7 +73,9 @@ public class DropAndDrag : MonoBehaviour
             if (socket != null)
                 socket.isOccupied = false;
 
+            // Quitar de la jerarquía y devolver física
             transform.SetParent(null, true);
+            if (rb != null) rb.isKinematic = false;
 
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
@@ -98,7 +108,7 @@ public class DropAndDrag : MonoBehaviour
         isSelected = false;
         IsDraggingAnyPiece = false; // Reset flag
 
-       // if (rb != null) rb.isKinematic = false;
+        // Solo devolver física si NO encajó en socket (se gestiona abajo)
 
         if (isAttached) return;
 
@@ -132,13 +142,40 @@ public class DropAndDrag : MonoBehaviour
         // 🔹 Si encontramos socket válido
         if (closestSocket != null)
         {
+            // ✅ ORDEN CORRECTO: kinematic ANTES de SetParent
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
+            // Guardar velocidad del padre (ej: jugador) antes del SetParent
+            // para que el snap no frene su movimiento
+            Rigidbody parentRb = closestSocket.GetComponentInParent<Rigidbody>();
+            Vector3 savedVelocity = Vector3.zero;
+            Vector3 savedAngular  = Vector3.zero;
+            if (parentRb != null && parentRb != rb)
+            {
+                savedVelocity = parentRb.linearVelocity;
+                savedAngular  = parentRb.angularVelocity;
+            }
+
             transform.position = closestSocket.transform.position;
             transform.rotation = closestSocket.transform.rotation;
-
             transform.SetParent(closestSocket.transform, true);
+
+            // Restaurar velocidad del padre tras el SetParent
+           /* if (parentRb != null && parentRb != rb)
+            {
+                parentRb.linearVelocity  = savedVelocity;
+                parentRb.angularVelocity = savedAngular;
+            }
+            */
 
             closestSocket.isOccupied = true;
 
+            // Activar los sockets propios de esta pieza
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
             {
@@ -152,10 +189,16 @@ public class DropAndDrag : MonoBehaviour
             attachedNode = closestSocket.transform;
             isAttached = true;
         }
+        else
+        {
+            // No encajó: devolver física normal
+            if (rb != null) rb.isKinematic = false;
+        }
     }
     public void OnChildClicked()
     {
         Debug.Log("Click recibido desde hijo");
+       // OnMouseDown();
         // Aquí pones lo que hacía OnMouseDown
     }
 
