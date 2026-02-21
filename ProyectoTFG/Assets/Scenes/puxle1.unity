@@ -5252,7 +5252,7 @@ MonoBehaviour:
   - {fileID: 1443765546}
   - {fileID: 587086782}
   - {fileID: 809137196}
-  playerTransform: {fileID: 2143972534}
+  playerTransform: {fileID: 1095468229}
 --- !u!23 &1669974024
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7578,7 +7578,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3812105538701874000, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}
       propertyPath: m_IsTrigger
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3968556304677557735, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}
       propertyPath: m_Layer
@@ -7682,7 +7682,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8130639992426980019, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}
       propertyPath: m_IsTrigger
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8399423748909397077, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}
       propertyPath: m_Enabled

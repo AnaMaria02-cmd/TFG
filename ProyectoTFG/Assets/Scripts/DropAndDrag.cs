@@ -80,8 +80,14 @@ public class DropAndDrag : MonoBehaviour
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
             {
+                // Comprobar con childCount > 0 (más fiable que isOccupied,
+                // que puede estar desincronizado). Si tiene hijos, significa
+                // que hay una pieza conectada → no desactivar para no apagar
+                // esa pieza (ej. pieza B) junto con el socket.
+                if (s.transform.childCount > 0)
+                    continue;
+
                 s.gameObject.SetActive(false);
-                s.isOccupied = false;
             }
 
             attachedNode = null;
@@ -197,6 +203,7 @@ public class DropAndDrag : MonoBehaviour
     }
     public void OnChildClicked()
     {
+
         Debug.Log("Click recibido desde hijo");
        // OnMouseDown();
         // Aquí pones lo que hacía OnMouseDown
