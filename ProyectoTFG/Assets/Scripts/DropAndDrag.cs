@@ -168,7 +168,7 @@ public class DropAndDrag : MonoBehaviour
             }
 
             transform.position = closestSocket.transform.position;
-            transform.rotation = closestSocket.transform.rotation;
+            // No sobreescribir la rotación: conservar la que el usuario aplicó
             transform.SetParent(closestSocket.transform, true);
 
             // Restaurar velocidad del padre tras el SetParent
