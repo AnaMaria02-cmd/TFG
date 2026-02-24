@@ -201,12 +201,9 @@ public class DropAndDrag : MonoBehaviour
             if (rb != null) rb.isKinematic = false;
         }
     }
-    public void OnChildClicked()
-    {
-
-        Debug.Log("Click recibido desde hijo");
-       // OnMouseDown();
-        // Aquí pones lo que hacía OnMouseDown
-    }
+    // ── Reenvíos desde ChildClickForwarder (avisaCollider) ───────────────────
+    public void OnChildMouseDown() => OnMouseDown();
+    public void OnChildMouseDrag() => OnMouseDrag();
+    public void OnChildMouseUp()   => OnMouseUp();
 
 }
