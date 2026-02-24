@@ -1,8 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Dibuja un cordón de "gelatina/plastilina" desde el jugador hasta el cursor.
-/// Requiere un LineRenderer en el mismo GameObject.
+/// Cordón de gelatina que:
+///  · Sale cuando el cursor pasa por encima de una pieza (DropAndDrag).
+///  · La punta sigue la pieza; si el cursor sale o la pieza se pega al jugador, el cordón retrae.
+///  · Mientras se arrastra una pieza, permanece retraído.
 /// </summary>
 [RequireComponent(typeof(LineRenderer))]
 public class GelCord : MonoBehaviour
@@ -13,108 +15,176 @@ public class GelCord : MonoBehaviour
     public Transform playerOrigin;
 
     [Header("Rango y Geometría")]
-    [Tooltip("Radio máximo en unidades de mundo. La punta se queda clavada al sobrepasar este límite.")]
     public float maxRange = 5f;
-    [Tooltip("Número de puntos del LineRenderer (≥20 para curva fluida).")]
     [Range(8, 64)]
     public int resolution = 24;
 
     [Header("Anchura / Estiramiento")]
-    [Tooltip("Anchura en la base (origen).")]
-    public float baseWidth = 0.15f;
-    [Tooltip("Anchura mínima en la punta cuando el cordón está al máximo de estiramiento.")]
-    public float minTipWidth = 0.02f;
+    public float baseWidth    = 0.15f;
+    public float minTipWidth  = 0.02f;
 
     [Header("Comportamiento Orgánico")]
-    [Tooltip("Cuánto cae el centro del cordón por 'gravedad' al máximo estiramiento.")]
-    public float gravitySag = 0.4f;
-    [Tooltip("Amplitud de la oscilación lateral senoidal.")]
-    public float wobbleAmplitude = 0.10f;
-    [Tooltip("Velocidad de la oscilación (radianes/s).")]
-    public float wobbleFrequency = 3.5f;
+    public float gravitySag       = 0.4f;
+    public float wobbleAmplitude  = 0.10f;
+    public float wobbleFrequency  = 3.5f;
 
-    [Header("Visibilidad")]
-    [Tooltip("Oculta el cordón cuando el cursor está muy cerca del origen.")]
-    public float hideRadius = 0.1f;
+    [Header("Retracción")]
+    [Tooltip("Velocidad (u/s) con la que la punta vuelve al origen.")]
+    public float retractSpeed = 10f;
+
+    [Header("Detección de Piezas")]
+    [Tooltip("LayerMask para el Raycast del cursor. Por defecto detecta todo.")]
+    public LayerMask pieceLayerMask = ~0;
+    [Tooltip("Distancia máxima del Raycast de detección.")]
+    public float detectMaxDist = 100f;
+
+    // ── Estado ────────────────────────────────────────────────────────────────
+    private enum CordState { Hidden, Extending, Retracting }
+    private CordState state = CordState.Hidden;
 
     // ── Privados ──────────────────────────────────────────────────────────────
     private LineRenderer lr;
     private Camera        cam;
+    private Vector3       tipPosition;    // posición 3D actual de la punta
+    private Transform     hoveredPiece;   // Transform de la pieza bajo el cursor
 
     // ─────────────────────────────────────────────────────────────────────────
     private void Awake()
     {
         lr = GetComponent<LineRenderer>();
-        lr.positionCount = resolution;
-        lr.useWorldSpace  = true;
+        lr.positionCount     = resolution;
+        lr.useWorldSpace     = true;
         lr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        lr.receiveShadows = false;
+        lr.receiveShadows    = false;
+        lr.enabled           = false;
 
         cam = Camera.main;
         if (playerOrigin == null) playerOrigin = transform;
+        tipPosition = playerOrigin.position;
     }
 
     private void Update()
     {
-        // ── 1. Posición del cursor en el plano del jugador ────────────────────
-        // Plano siempre perpendicular a la cámara → funciona con cualquier rotación
-        Plane dragPlane = new Plane(-cam.transform.forward, playerOrigin.position);
-        Ray   ray        = cam.ScreenPointToRay(Input.mousePosition);
-        Vector3 cursorWorld = playerOrigin.position; // fallback
+        DetectPieceUnderCursor();
+        UpdateState();
+        if (lr.enabled) DrawCord();
+    }
 
-        if (dragPlane.Raycast(ray, out float hitDist))
-            cursorWorld = ray.GetPoint(hitDist);
+    // ── Detección ─────────────────────────────────────────────────────────────
+    private void DetectPieceUnderCursor()
+    {
+        // Mientras se arrastra algo, no detectar piezas nuevas
+        if (DropAndDrag.IsDraggingAnyPiece)
+        {
+            hoveredPiece = null;
+            return;
+        }
 
-        // ── 2. Clamp al radio máximo ──────────────────────────────────────────
-        Vector3 delta    = cursorWorld - playerOrigin.position;
-        float rawDist    = delta.magnitude;
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, detectMaxDist, pieceLayerMask))
+        {
+            DropAndDrag dd = hit.collider.GetComponentInParent<DropAndDrag>();
+            hoveredPiece = (dd != null) ? dd.transform : null;
+        }
+        else
+        {
+            hoveredPiece = null;
+        }
+    }
 
-        // Ocultar si el cursor está pegado al origen
-        lr.enabled = rawDist > hideRadius;
-        if (!lr.enabled) return;
+    // ── Máquina de estados ────────────────────────────────────────────────────
+    private void UpdateState()
+    {
+        switch (state)
+        {
+            // ── OCULTO: espera que el cursor pase sobre una pieza
+            case CordState.Hidden:
+                lr.enabled = false;
+                if (hoveredPiece != null)
+                {
+                    tipPosition = playerOrigin.position; // sale desde el origen
+                    lr.enabled  = true;
+                    state       = CordState.Extending;
+                }
+                break;
 
-        float clampedDist  = Mathf.Min(rawDist, maxRange);
-        float stretchRatio = (maxRange > 0f) ? clampedDist / maxRange : 0f; // 0–1
+            // ── EXTENDIDO: punta sigue la pieza detectada
+            case CordState.Extending:
+                if (hoveredPiece == null || DropAndDrag.IsDraggingAnyPiece)
+                {
+                    // Cursor salió de la pieza, o la pieza fue agarrada/pegada → retraer
+                    state = CordState.Retracting;
+                    break;
+                }
 
+                // La punta va hacia la pieza, limitada al maxRange
+                Vector3 toTarget = hoveredPiece.position - playerOrigin.position;
+                float   dist     = Mathf.Min(toTarget.magnitude, maxRange);
+                tipPosition = playerOrigin.position + toTarget.normalized * dist;
+                break;
+
+            // ── RETRACTANDO: la punta vuelve al origen suavemente
+            case CordState.Retracting:
+                tipPosition = Vector3.MoveTowards(tipPosition, playerOrigin.position,
+                                                  retractSpeed * Time.deltaTime);
+
+                if (Vector3.Distance(tipPosition, playerOrigin.position) < 0.05f)
+                {
+                    lr.enabled = false;
+                    state      = CordState.Hidden;
+
+                    // Si justo al terminar de retraer el cursor ya está sobre otra pieza,
+                    // empezamos a extender de nuevo sin esperar un frame extra
+                    if (hoveredPiece != null && !DropAndDrag.IsDraggingAnyPiece)
+                    {
+                        tipPosition = playerOrigin.position;
+                        lr.enabled  = true;
+                        state       = CordState.Extending;
+                    }
+                }
+                break;
+        }
+    }
+
+    // ── Dibujo del cordón ─────────────────────────────────────────────────────
+    private void DrawCord()
+    {
         Vector3 origin = playerOrigin.position;
-        Vector3 tipPos = origin + delta.normalized * clampedDist;
+        Vector3 tipPos = tipPosition;
 
-        // ── 3. Anchura dinámica (se adelgaza al estirar) ──────────────────────
-        float tipWidth = Mathf.Lerp(baseWidth, minTipWidth, stretchRatio);
+        float stretchRatio = (maxRange > 0f)
+            ? Mathf.Clamp01(Vector3.Distance(origin, tipPos) / maxRange)
+            : 0f;
+
+        // Anchura dinámica
         lr.startWidth = baseWidth;
-        lr.endWidth   = tipWidth;
+        lr.endWidth   = Mathf.Lerp(baseWidth, minTipWidth, stretchRatio);
 
-        // ── 4. Eje perpendicular relativo a la cámara (funciona en cualquier orientación) ─
+        // Eje perpendicular relativo a la cámara
         Vector3 cordDir = (tipPos - origin).normalized;
-        // Cross del cordón con el 'arriba' de la cámara → perpendicular visible desde la cámara
-        Vector3 perp = Vector3.Cross(cordDir, cam.transform.up).normalized;
-        if (perp.sqrMagnitude < 0.001f)
-            perp = cam.transform.right; // fallback si el cordón es paralelo al up de la cámara
+        if (cordDir.sqrMagnitude < 0.001f) cordDir = cam.transform.forward;
 
-        // ── 5. Construir los puntos de la curva ───────────────────────────────
+        Vector3 perp = Vector3.Cross(cordDir, cam.transform.up).normalized;
+        if (perp.sqrMagnitude < 0.001f) perp = cam.transform.right;
+
         for (int i = 0; i < resolution; i++)
         {
-            float t = (float)i / (resolution - 1); // 0 → 1
+            float t   = (float)i / (resolution - 1);
+            Vector3 p = Vector3.Lerp(origin, tipPos, t);
 
-            // Posición base: interpolación lineal origen → punta
-            Vector3 pos = Vector3.Lerp(origin, tipPos, t);
+            // Caída gravitatoria parabólica
+            p.y += -gravitySag * stretchRatio * Mathf.Sin(t * Mathf.PI);
 
-            // Caída gravitatoria: parábola máxima en el centro, escala con stretchRatio
-            float sag = -gravitySag * stretchRatio * Mathf.Sin(t * Mathf.PI);
-            pos.y += sag;
-
-            // Oscilación lateral senoidal: más débil cerca de la punta (inmóvil)
+            // Oscilación lateral senoidal
             float envelope = Mathf.Sin(t * Mathf.PI); // 0 en bordes, 1 en centro
-            float wobble   = wobbleAmplitude * envelope
-                           * Mathf.Sin(t * Mathf.PI * 2f + Time.time * wobbleFrequency);
-            pos += perp * wobble;
+            p += perp * (wobbleAmplitude * envelope
+                        * Mathf.Sin(t * Mathf.PI * 2f + Time.time * wobbleFrequency));
 
-            lr.SetPosition(i, pos);
+            lr.SetPosition(i, p);
         }
     }
 
 #if UNITY_EDITOR
-    // Dibuja el radio máximo en el Editor para facilitar el ajuste
     private void OnDrawGizmosSelected()
     {
         if (playerOrigin == null) return;
