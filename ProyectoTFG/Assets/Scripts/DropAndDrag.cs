@@ -131,28 +131,72 @@ public class DropAndDrag : MonoBehaviour
         if (isAttached) return;
 
         Socket closestSocket = null;
+        Socket closestMySocket = null;
+        float smallestDistance = snapDistance;
 
-        // 🔹 USAR SOCKET MANAGER (forma correcta)
+        Socket[] mySockets = GetComponentsInChildren<Socket>(true);
+
+        // 🔹 Buscar el mejor socket usando SocketManager o Fallback
         if (SocketManager.Instance != null)
         {
-            closestSocket = SocketManager.Instance.GetClosestSocket(worldPosition, snapDistance);
+            if (mySockets.Length > 0)
+            {
+                foreach (Socket mySocket in mySockets)
+                {
+                    if (mySocket.transform.childCount > 0) continue;
+
+                    Socket wSocket = SocketManager.Instance.GetClosestSocket(mySocket.transform.position, smallestDistance, this.transform);
+                    if (wSocket != null)
+                    {
+                        float d = Vector3.Distance(mySocket.transform.position, wSocket.transform.position);
+                        if (d < smallestDistance)
+                        {
+                            smallestDistance = d;
+                            closestSocket = wSocket;
+                            closestMySocket = mySocket;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                closestSocket = SocketManager.Instance.GetClosestSocket(worldPosition, snapDistance, this.transform);
+            }
         }
         else
         {
             // 🔹 Fallback por si no existe el manager
-            float smallestDistance = snapDistance;
-
-            foreach (Socket socket in FindObjectsOfType<Socket>())
+            foreach (Socket worldSocket in FindObjectsOfType<Socket>())
             {
-                if (socket == null || socket.isOccupied || !socket.gameObject.activeInHierarchy)
+                if (worldSocket == null || worldSocket.isOccupied || !worldSocket.gameObject.activeInHierarchy)
+                    continue;
+                
+                if (worldSocket.transform.IsChildOf(this.transform))
                     continue;
 
-                float d = Vector3.Distance(socket.transform.position, worldPosition);
-
-                if (d < smallestDistance)
+                if (mySockets.Length > 0)
                 {
-                    smallestDistance = d;
-                    closestSocket = socket;
+                    foreach (Socket mySocket in mySockets)
+                    {
+                        if (mySocket.transform.childCount > 0) continue;
+
+                        float d = Vector3.Distance(mySocket.transform.position, worldSocket.transform.position);
+                        if (d < smallestDistance)
+                        {
+                            smallestDistance = d;
+                            closestSocket = worldSocket;
+                            closestMySocket = mySocket;
+                        }
+                    }
+                }
+                else
+                {
+                    float d = Vector3.Distance(worldSocket.transform.position, worldPosition);
+                    if (d < smallestDistance)
+                    {
+                        smallestDistance = d;
+                        closestSocket = worldSocket;
+                    }
                 }
             }
         }
@@ -179,7 +223,17 @@ public class DropAndDrag : MonoBehaviour
                 savedAngular  = parentRb.angularVelocity;
             }
 
-            transform.position = closestSocket.transform.position;
+            // 🔹 Aplicar Offset si conectamos por un socket propio
+            if (closestMySocket != null)
+            {
+                Vector3 offset = closestMySocket.transform.position - transform.position;
+                transform.position = closestSocket.transform.position - offset;
+            }
+            else
+            {
+                transform.position = closestSocket.transform.position;
+            }
+
             // No sobreescribir la rotación: conservar la que el usuario aplicó
             transform.SetParent(closestSocket.transform, true);
 
@@ -200,7 +254,14 @@ public class DropAndDrag : MonoBehaviour
                 if (s.transform != closestSocket.transform)
                 {
                     s.gameObject.SetActive(true);
-                    s.isOccupied = false;
+                    if (closestMySocket != null && s == closestMySocket)
+                    {
+                        s.isOccupied = true;
+                    }
+                    else
+                    {
+                        s.isOccupied = false;
+                    }
                 }
             }
 

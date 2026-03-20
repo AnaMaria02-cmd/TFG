@@ -35,7 +35,7 @@ public class SocketManager : MonoBehaviour
         }
     }
 
-    public Socket GetClosestSocket(Vector3 position, float maxDistance)
+    public Socket GetClosestSocket(Vector3 position, float maxDistance, Transform excludeTransform = null)
     {
         Socket closest = null;
         float minDistance = maxDistance;
@@ -43,6 +43,8 @@ public class SocketManager : MonoBehaviour
         foreach (var socket in allSockets)
         {
             if (socket == null || socket.isOccupied || !socket.gameObject.activeInHierarchy) continue;
+            
+            if (excludeTransform != null && socket.transform.IsChildOf(excludeTransform)) continue;
 
             float dist = Vector3.Distance(position, socket.transform.position);
             if (dist < minDistance)
