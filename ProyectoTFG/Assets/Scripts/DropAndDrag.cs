@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DropAndDrag : MonoBehaviour
@@ -100,6 +100,18 @@ public class DropAndDrag : MonoBehaviour
         if (isAttached) return;
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        bool isPlayerMoving = Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0;
+
+        if (isPlayerMoving)
+        {
+            // Mientras el jugador se mueve, bloqueamos la posición de la pieza en el mundo.
+            // Actualizamos el offset para que cuando se detenga el jugador, la pieza no dé un salto.
+            if (dragPlane.Raycast(ray, out float d))
+            {
+                mouseOffset = transform.position - ray.GetPoint(d);
+            }
+            return;
+        }
 
         if (dragPlane.Raycast(ray, out float distance))
         {
