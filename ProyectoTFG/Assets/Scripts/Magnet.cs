@@ -10,10 +10,12 @@ public class Magnet : MonoBehaviour
     public float attractionForce = 20f;
     [Tooltip("El tag que deben tener las monedas para ser afectadas.")]
     public string coinTag = "Coin";
+    public bool activado = true;
 
     void FixedUpdate()
     {
-        // Buscar todas las colisiones dentro del radio de atracción
+        if (!activado) return;
+
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, attractionRadius);
         foreach (var hitCollider in hitColliders)
         {
@@ -22,19 +24,26 @@ public class Magnet : MonoBehaviour
             {
                 Debug.Log("Moneda encontrada");
                 Rigidbody coinRb = hitCollider.GetComponent<Rigidbody>();
-                
+
                 // Solo atraemos si tiene Rigidbody y no es cinemático (ya que si lo es, ya está pegado)
                 if (coinRb != null && !coinRb.isKinematic)
                 {
-                    // Calcular la dirección hacia el imán
-                    Vector3 directionToMagnet = (transform.position - coinRb.transform.position).normalized;
-                    
-                    // Calcular la distancia para hacer la fuerza mayor cuanto más cerca esté (opcional)
-                    float distance = Vector3.Distance(transform.position, coinRb.transform.position);
-                    float forceMultiplier = 1f - (distance / attractionRadius); // Más fuerte de cerca
+                    Vector3 delta = transform.position - coinRb.transform.position;
+                    float distance = delta.magnitude;
 
-                    // Aplicar la fuerza magnética
-                    coinRb.AddForce(directionToMagnet * attractionForce * forceMultiplier, ForceMode.Acceleration);
+                    // Evitamos errores si la distancia es casi cero
+                    if (distance > 0.1f)
+                    {
+                        Vector3 directionToMagnet = delta.normalized;
+                        // Usamos Clamp01 para evitar valores negativos
+                        float forceMultiplier = Mathf.Clamp01(1f - (distance / attractionRadius));
+
+                        // Aplicamos la fuerza
+                        coinRb.AddForce(directionToMagnet * attractionForce * forceMultiplier, ForceMode.Acceleration);
+
+                        // Opcional: Aplicar un poco de "Drag" artificial para que no lleguen con demasiada velocidad
+                        coinRb.linearVelocity *= 0.95f;
+                    }
                 }
             }
         }
@@ -42,7 +51,6 @@ public class Magnet : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        // Cuando una moneda choca físicamente contra el imán
         if (collision.gameObject.CompareTag(coinTag))
         {
             Rigidbody coinRb = collision.gameObject.GetComponent<Rigidbody>();
@@ -66,5 +74,37 @@ public class Magnet : MonoBehaviour
         Gizmos.DrawSphere(transform.position, attractionRadius);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, attractionRadius);
+    }
+    
+    public void cambiarFuerza()
+    {
+        if (activado)
+        {
+            activado = false;
+            SoltarMonedas();
+        }
+        else
+        {
+            activado = true;
+        }
+    }
+
+    private void SoltarMonedas()
+    {
+        // Iteramos hacia atrás porque vamos a quitarles el parent
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Transform child = transform.GetChild(i);
+            
+            if (child.CompareTag(coinTag))
+            {
+                child.SetParent(null);
+                Rigidbody rb = child.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.isKinematic = false;
+                }
+            }
+        }
     }
 }
