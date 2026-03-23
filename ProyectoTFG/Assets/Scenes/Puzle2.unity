@@ -1046,6 +1046,19 @@ MonoBehaviour:
   attractionForce: 500
   coinTag: Coin
   activado: 1
+--- !u!114 &246918349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 246918338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fee605cff733e5418ec735be1efe9ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isOccupied: 0
 --- !u!1 &246926255
 GameObject:
   m_ObjectHideFlags: 0
@@ -2525,8 +2538,24 @@ PrefabInstance:
       propertyPath: 'nodes.Array.data[5]'
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 1346749983530105835, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2254280456544218737, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2627690790941929908, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3725920337457925272, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3862619922518732374, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6201746488443105046, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
@@ -2580,6 +2609,14 @@ PrefabInstance:
     - target: {fileID: 6726925655593530796, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -182.243
+      objectReference: {fileID: 0}
+    - target: {fileID: 7564892743139094344, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7615275123854243100, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4491,6 +4528,22 @@ PrefabInstance:
       propertyPath: 'nodes.Array.data[4]'
       value: 
       objectReference: {fileID: 830919059}
+    - target: {fileID: 1346749983530105835, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2627690790941929908, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3725920337457925272, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3862619922518732374, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6201746488443105046, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
       propertyPath: m_Name
       value: CilindroBlandoNuevo Variant
@@ -4538,6 +4591,18 @@ PrefabInstance:
     - target: {fileID: 6726925655593530796, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -182.243
+      objectReference: {fileID: 0}
+    - target: {fileID: 7564892743139094344, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7564892743139094344, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_AutoConfigureConnectedAnchor
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7615275123854243100, guid: a0f2d5a07c36a1642bbd6aca6fcf0190, type: 3}
+      propertyPath: m_EnablePreprocessing
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9913,7 +9978,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1753003951725948978, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.67
+      value: -9.15
       objectReference: {fileID: 0}
     - target: {fileID: 1753003951725948978, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9921,7 +9986,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1753003951725948978, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.6268272
+      value: -2.91
       objectReference: {fileID: 0}
     - target: {fileID: 1753003951725948978, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
       propertyPath: m_LocalRotation.w
@@ -9957,7 +10022,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6278078677776080027, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
       propertyPath: m_Layer
-      value: 10
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6278078677776080027, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
+      propertyPath: m_TagString
+      value: AttachedPiece
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9969,6 +10038,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6278078677776080027, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
       insertIndex: -1
       addedObject: {fileID: 246918344}
+    - targetCorrespondingSourceObject: {fileID: 6278078677776080027, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 246918349}
   m_SourcePrefab: {fileID: 100100000, guid: ebbc6539fac19774e95aa02e8511ff89, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

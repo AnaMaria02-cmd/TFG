@@ -90,6 +90,19 @@ public class DropAndDrag : MonoBehaviour
                 s.gameObject.SetActive(false);
             }
 
+            // Desconectar el joints que hubiéramos conectado al padre
+            Rigidbody prevParentRb = attachedNode != null ? attachedNode.GetComponentInParent<Rigidbody>() : null;
+            if (prevParentRb != null)
+            {
+                foreach (CharacterJoint cj in GetComponentsInChildren<CharacterJoint>())
+                {
+                    if (cj.connectedBody == prevParentRb)
+                    {
+                        cj.connectedBody = null;
+                    }
+                }
+            }
+
             attachedNode = null;
             isAttached = false;
         }
@@ -244,6 +257,84 @@ public class DropAndDrag : MonoBehaviour
                 parentRb.angularVelocity = savedAngular;
             }
             */
+
+            // 🔹 LOGICA PARA CUERDAS (CharacterJoint)
+            Rigidbody targetRb = closestSocket.GetComponentInParent<Rigidbody>();
+            if (targetRb != null)
+            {
+                CharacterJoint candidateJoint = null;
+
+                if (closestMySocket != null)
+                {
+                    // Se conectó desde un extremo/socket específico
+                    candidateJoint = closestMySocket.GetComponentInParent<CharacterJoint>();
+                }
+                else
+                {
+                    // Se conectó desde la base
+                    candidateJoint = GetComponent<CharacterJoint>();
+                    if (candidateJoint == null)
+                    {
+                        float minJointDist = float.MaxValue;
+                        foreach (CharacterJoint cj in GetComponentsInChildren<CharacterJoint>())
+                        {
+                            float dist = Vector3.Distance(cj.transform.position, closestSocket.transform.position);
+                            if (dist < minJointDist)
+                            {
+                                minJointDist = dist;
+                                candidateJoint = cj;
+                            }
+                        }
+                    }
+                }
+
+                // 🔹 CONECTAMOS EL SEGMENTO AL JUGADOR (Sea la Base o la Punta)
+                if (candidateJoint != null)
+                {
+                    candidateJoint.autoConfigureConnectedAnchor = true;
+                    candidateJoint.connectedBody = targetRb;
+                    Debug.Log($"[CUERDA CONEXION] Segmento enganchado al jugador: '{candidateJoint.gameObject.name}' -> '{targetRb.gameObject.name}'");
+
+                    // 🔹 REORGANIZAMOS TODA LA CADENA DE CONEXIONES PARA QUE CUELGUEN DE ESTE SEGMENTO
+                    // Esto asegura que, sin importar por dónde agarres la cuerda, el resto cuelga físicamente.
+                    foreach (CharacterJoint cj in GetComponentsInChildren<CharacterJoint>())
+                    {
+                        if (cj == candidateJoint) continue;
+
+                        Rigidbody towardsRootRb = null;
+
+                        // Si el segmento al que estamos enganchados (candidateJoint) está DENTRO de los hijos de 'cj'
+                        if (candidateJoint.transform.IsChildOf(cj.transform))
+                        {
+                            // La cadena fluye Hacia ABAJO (del padre al hijo) para llegar al punto enganchado
+                            foreach (Transform child in cj.transform)
+                            {
+                                if (candidateJoint.transform == child || candidateJoint.transform.IsChildOf(child))
+                                {
+                                    towardsRootRb = child.GetComponent<Rigidbody>();
+                                    if (towardsRootRb == null) towardsRootRb = child.GetComponentInChildren<Rigidbody>();
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // La cadena fluye Hacia ARRIBA (del hijo al padre) para llegar al punto enganchado
+                            if (cj.transform.parent != null)
+                            {
+                                towardsRootRb = cj.transform.parent.GetComponentInParent<Rigidbody>();
+                            }
+                        }
+
+                        if (towardsRootRb != null)
+                        {
+                            cj.autoConfigureConnectedAnchor = true;
+                            cj.connectedBody = towardsRootRb;
+                            Debug.Log($"[CUERDA RE-ROOT] '{cj.gameObject.name}' reconectado hacia '{towardsRootRb.gameObject.name}' para colgar del nuevo enganche");
+                        }
+                    }
+                }
+            }
 
             closestSocket.isOccupied = true;
 
