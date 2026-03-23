@@ -19,11 +19,14 @@ public class DropAndDrag : MonoBehaviour
     private Plane dragPlane;
     private Camera cam;
     private Rigidbody rb;
+    private Renderer[] renderers;
 
     private void Start()
     {
         cam = Camera.main;
         rb = GetComponent<Rigidbody>();
+        renderers = GetComponentsInChildren<Renderer>(); // Guardar todos los renderers para el brillo
+
         // Si empieza suelta, activar física normal
         if (rb != null && !isAttached)
             rb.isKinematic = false;
@@ -53,6 +56,7 @@ public class DropAndDrag : MonoBehaviour
     {
         isSelected = true;
         IsDraggingAnyPiece = true; // Set flag
+        SetHighlight(true); // Brillo al agarrar
 
         // Al coger la pieza: kinematic para que no choque mientras se arrastra
         if (rb != null) rb.isKinematic = true;
@@ -138,6 +142,7 @@ public class DropAndDrag : MonoBehaviour
     {
         isSelected = false;
         IsDraggingAnyPiece = false; // Reset flag
+        SetHighlight(false); // Quitar brillo al soltar
 
         // Solo devolver física si NO encajó en socket (se gestiona abajo)
 
@@ -370,4 +375,43 @@ public class DropAndDrag : MonoBehaviour
     public void OnChildMouseDrag() => OnMouseDrag();
     public void OnChildMouseUp()   => OnMouseUp();
 
+    // ── Resaltado Visual (Borde Amarillo) ────────────────────────────────────
+    private void OnMouseEnter()
+    {
+        // Solo iluminar si no está pegado y nadie está arrastrando nada
+        if (!isAttached && !IsDraggingAnyPiece) 
+        {
+            SetHighlight(true);
+        }
+    }
+
+    private void OnMouseExit()
+    {
+        // Solo quitar si no lo estamos agarrando
+        if (!isSelected) 
+        {
+            SetHighlight(false);
+        }
+    }
+
+    private void SetHighlight(bool enable)
+    {
+        if (renderers == null) return;
+        foreach (Renderer r in renderers)
+        {
+            foreach (Material m in r.materials)
+            {
+                if (enable)
+                {
+                    m.EnableKeyword("_EMISSION");
+                    m.SetColor("_EmissionColor", Color.yellow * 0.4f); // Brillo amarillo ajustado
+                }
+                else
+                {
+                    m.DisableKeyword("_EMISSION");
+                    m.SetColor("_EmissionColor", Color.black);
+                }
+            }
+        }
+    }
 }

@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     public float speed = 5f;
+    [Tooltip("Velocidad a la que gira el personaje. Menor valor = giro más suave/gradual.")]
+    public float rotationSpeed = 10f;
     public float jumpForce = 6f;
     public float groundCheckDistance = 0.2f;
 
@@ -37,13 +39,11 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 movement = new Vector3(moveX, 0f, moveZ);
-        /*
-        // Rotación
         if (movement.magnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(movement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, speed * Time.fixedDeltaTime);
-        }*/
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+        }
 
         rb.linearVelocity = new Vector3(
             movement.x * speed,
