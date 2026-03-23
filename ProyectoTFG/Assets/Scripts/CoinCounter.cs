@@ -54,9 +54,21 @@ public class CoinCounter : MonoBehaviour
         {
             coinUIText.text = "Monedas: " + currentCoins.ToString();
         }
-        else
+    }
+
+    // ── MÉTODOS PÚBLICOS PARA LA TIENDA ──
+
+    public int GetCurrentCoins()
+    {
+        return currentCoins;
+    }
+
+    public void SpendCoins(int amount)
+    {
+        if (currentCoins >= amount)
         {
-            Debug.LogWarning("[CoinCounter] No has asignado el componente de Texto (UI) en el inspector.");
+            currentCoins -= amount;
+            UpdateUI();
         }
     }
 }
