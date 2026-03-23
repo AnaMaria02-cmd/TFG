@@ -58,7 +58,7 @@ public class DropAndDrag : MonoBehaviour
         if (rb != null) rb.isKinematic = true;
 
         // Plano que bloquea eje Z
-        dragPlane = new Plane(Vector3.forward, transform.position);
+        dragPlane = new Plane(-cam.transform.forward, transform.position);
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (dragPlane.Raycast(ray, out float distance))
