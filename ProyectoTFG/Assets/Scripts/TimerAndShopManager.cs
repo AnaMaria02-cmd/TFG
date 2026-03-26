@@ -22,6 +22,17 @@ public class TimerAndShopManager : MonoBehaviour
     [Header("Configuración del Inventario")]
     public GameObject inventoryPanel; // Arrastrar el panel del Inventario (edición) aquí
     
+    [Header("Reset de Escenario e Inicio")]
+    [Tooltip("El Prefab que contiene TODAS las pelotas/monedas juntas")]
+    public GameObject prefabPelotasEscenario;
+    [Tooltip("El Transform de tu Jugador")]
+    public Transform jugadorTransform;
+    [Tooltip("Un GameObject vacío colodado donde el jugador debe reaparecer siempre")]
+    public Transform jugadorSpawnPoint;
+    
+    // Rastreador interno de las pelotas actualmente en el mapa
+    private GameObject instanciaPelotasActual;
+
     [Header("Referencias")]
     [Tooltip("Arrastra el objeto que tiene el script CoinCounter (el hueco) para leer el dinero")]
     public CoinCounter coinCounter; 
@@ -37,6 +48,9 @@ public class TimerAndShopManager : MonoBehaviour
         if (shopPanel != null) shopPanel.SetActive(false);
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
         Time.timeScale = 1f; 
+        
+        // Al empezar la partida también spawneamos las pelotas la primera vez
+        SpawnearPelotas();
     }
 
     private void Update()
@@ -151,16 +165,64 @@ public class TimerAndShopManager : MonoBehaviour
         if (shopPanel != null) shopPanel.SetActive(false);
         if (inventoryPanel != null) inventoryPanel.SetActive(true);
         
+        // LIMPIEZA DE MAPA
+        // Destruir las pelotas antiguas que hubiese en pantalla
+        if (instanciaPelotasActual != null) 
+        {
+            Destroy(instanciaPelotasActual);
+            instanciaPelotasActual = null;
+        }
+        else 
+        {
+            // Opcional: Si el usuario había puesto pelotas a mano en la escena y es la primera vez,
+            // podemos buscarlas por tag y eliminarlas. Añade tag "Moneda" o "Pelota" a esos objetos en el futuro si lo necesitas.
+            GameObject[] pelotasManuales = GameObject.FindGameObjectsWithTag("Coin"); // Usar el tag correcto si hace falta
+            foreach(GameObject p in pelotasManuales) Destroy(p);
+        }
+
+        // MOVER AL JUGADOR AL INICIO DE LA PANTALLA
+        if (jugadorTransform != null && jugadorSpawnPoint != null)
+        {
+            // Apagamos físicas momentáneamente si usa un CharacterController o Rigidbody especial
+            // Aunque mover por Transform a veces funciona directo
+            jugadorTransform.position = jugadorSpawnPoint.position;
+            jugadorTransform.rotation = jugadorSpawnPoint.rotation;
+        }
+
         // El cronómetro sigue parado mientras el jugador se edita y elige piezas
         Time.timeScale = 1f; // Permitimos físicas para que el jugador pueda interactuar o editar sus piezas
         isTimerRunning = false;
+    }
+
+    // Método interno para generar todas las pelotas otra vez
+    private void SpawnearPelotas()
+    {
+        if (prefabPelotasEscenario != null)
+        {
+            // Por precaución, si ya había unas instanciadas, las volvemos a borrar
+            if (instanciaPelotasActual != null) Destroy(instanciaPelotasActual);
+
+            // Las instanciamos en la coordenada 0,0,0 pensando en que el Prefab ya las tiene en sus posiciones del nivel correctas
+            instanciaPelotasActual = Instantiate(prefabPelotasEscenario, Vector3.zero, Quaternion.identity);
+        }
     }
 
     // Asignar al botón "Play"/Jugar dentro del inventario
     public void StartGame()
     {
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
-        
+        // MOVER AL JUGADOR AL INICIO DE LA PANTALLA
+        if (jugadorTransform != null && jugadorSpawnPoint != null)
+        {
+            // Apagamos físicas momentáneamente si usa un CharacterController o Rigidbody especial
+            // Aunque mover por Transform a veces funciona directo
+            jugadorTransform.position = jugadorSpawnPoint.position;
+            jugadorTransform.rotation = jugadorSpawnPoint.rotation;
+        }
+
+        // RECARGAR EL NIVEL GENERANDO TODAS LAS PELOTAS
+        SpawnearPelotas();
+
         // Empieza el cronómetro de (ej. 60 segundos) y se reanuda el bucle del juego
         timeRemaining = 60f;
         isTimerRunning = true;
