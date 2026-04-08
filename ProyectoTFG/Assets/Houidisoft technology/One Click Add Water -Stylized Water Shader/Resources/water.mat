@@ -191,7 +191,7 @@ Material:
     - _Wave_ampllitude: 0.1
     - _Waveampllitude: 2
     - _Waves_Length: 0.2
-    - _Waves_height: 1
+    - _Waves_height: 0.01
     - _WorkflowMode: 1
     - _ZWrite: 1
     - _angle: 0.001

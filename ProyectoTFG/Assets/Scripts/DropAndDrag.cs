@@ -84,11 +84,16 @@ public class DropAndDrag : MonoBehaviour
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
             {
+                // Solo gestionar los sockets que pertenecen a ESTA pieza, no a piezas hijas (como el imán)
+                DropAndDrag socketOwner = s.GetComponentInParent<DropAndDrag>();
+                if (socketOwner != this)
+                    continue;
+
                 // Comprobar con childCount > 0 (más fiable que isOccupied,
                 // que puede estar desincronizado). Si tiene hijos, significa
                 // que hay una pieza conectada → no desactivar para no apagar
                 // esa pieza (ej. pieza B) junto con el socket.
-                if (s.transform.childCount > 0)
+                if (s.transform.childCount > 0 || s.isOccupied)
                     continue;
 
                 s.gameObject.SetActive(false);
@@ -347,6 +352,11 @@ public class DropAndDrag : MonoBehaviour
             Socket[] childSockets = GetComponentsInChildren<Socket>(true);
             foreach (Socket s in childSockets)
             {
+                // Ignorar sockets de piezas hijas (como el Imán)
+                DropAndDrag socketOwner = s.GetComponentInParent<DropAndDrag>();
+                if (socketOwner != this)
+                    continue;
+
                 if (s.transform != closestSocket.transform)
                 {
                     s.gameObject.SetActive(true);

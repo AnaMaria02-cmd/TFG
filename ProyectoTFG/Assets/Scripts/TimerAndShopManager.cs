@@ -19,6 +19,13 @@ public class TimerAndShopManager : MonoBehaviour
     public int costeBlanda = 8;
     public int costeIman = 20;
 
+    [Header("Incremento y UI de Precios")]
+    [Tooltip("Por cuánto se multiplica el precio cada vez que compras")]
+    public float multiplicadorPrecio = 1.5f;
+    public TextMeshProUGUI textoPrecioLarga;
+    public TextMeshProUGUI textoPrecioBlanda;
+    public TextMeshProUGUI textoPrecioIman;
+
     [Header("Configuración del Inventario")]
     public GameObject inventoryPanel; // Arrastrar el panel del Inventario (edición) aquí
     
@@ -68,6 +75,12 @@ public class TimerAndShopManager : MonoBehaviour
                 timeRemaining = 0;
                 isTimerRunning = false;
                 UpdateTimerUI();
+                
+                if (InventoryManager.Instance != null) 
+                {
+                    InventoryManager.Instance.EncenderTodosImanes();
+                }
+
                 OpenShop();
             }
         }
@@ -93,8 +106,16 @@ public class TimerAndShopManager : MonoBehaviour
         // Mostrar el panel de la tienda
         if (shopPanel != null) shopPanel.SetActive(true);
 
-        // Actualizar el texto del dinero
+        // Actualizar el texto del dinero y precios
         UpdateMoneyUI();
+        ActualizarTextosPrecios();
+    }
+
+    private void ActualizarTextosPrecios()
+    {
+        if (textoPrecioLarga != null) textoPrecioLarga.text = costeLarga.ToString();
+        if (textoPrecioBlanda != null) textoPrecioBlanda.text = costeBlanda.ToString();
+        if (textoPrecioIman != null) textoPrecioIman.text = costeIman.ToString();
     }
 
     private void UpdateMoneyUI()
@@ -123,7 +144,12 @@ public class TimerAndShopManager : MonoBehaviour
     {
         if (TrySpendMoney(costeLarga))
         {
-            if (InventoryManager.Instance != null) InventoryManager.Instance.AddPieceToInventory(null, "Pieza Larga");
+            if (InventoryManager.Instance != null) 
+            {
+                InventoryManager.Instance.AddPieceToInventory(null, "Pieza Larga");
+                costeLarga = Mathf.RoundToInt(costeLarga * multiplicadorPrecio);
+                ActualizarTextosPrecios();
+            }
             else Debug.LogWarning("¡Te falta el InventoryManager en tu escena para guardar la pieza!");
         }
         else Debug.LogWarning("No tienes dinero suficiente para la Pieza Larga");
@@ -133,7 +159,12 @@ public class TimerAndShopManager : MonoBehaviour
     {
         if (TrySpendMoney(costeBlanda))
         {
-            if (InventoryManager.Instance != null) InventoryManager.Instance.AddPieceToInventory(null, "Pieza Blanda");
+            if (InventoryManager.Instance != null) 
+            {
+                InventoryManager.Instance.AddPieceToInventory(null, "Pieza Blanda");
+                costeBlanda = Mathf.RoundToInt(costeBlanda * multiplicadorPrecio);
+                ActualizarTextosPrecios();
+            }
             else Debug.LogWarning("¡Te falta el InventoryManager en tu escena para guardar la pieza!");
         }
         else Debug.LogWarning("No tienes dinero suficiente para la Pieza Blanda");
@@ -143,7 +174,12 @@ public class TimerAndShopManager : MonoBehaviour
     {
         if (TrySpendMoney(costeIman))
         {
-            if (InventoryManager.Instance != null) InventoryManager.Instance.AddPieceToInventory(null, "Iman");
+            if (InventoryManager.Instance != null) 
+            {
+                InventoryManager.Instance.AddPieceToInventory(null, "Iman");
+                costeIman = Mathf.RoundToInt(costeIman * multiplicadorPrecio);
+                ActualizarTextosPrecios();
+            }
             else Debug.LogWarning("¡Te falta el InventoryManager en tu escena para guardar la pieza!");
         }
         else Debug.LogWarning("No tienes dinero suficiente para el Iman");

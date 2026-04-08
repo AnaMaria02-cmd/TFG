@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     private float moveX;
     private float moveZ;
     private bool isGrounded;
+    private bool jumpIntent;
 
     void Start()
     {
@@ -24,15 +25,18 @@ public class PlayerMovement : MonoBehaviour
         moveZ = Input.GetAxis("Vertical");
 
         // Raycast desde un poco más abajo
+        Vector3 rayStart = transform.position + Vector3.up * 0.1f;
         isGrounded = Physics.Raycast(
-            transform.position + Vector3.up * 0.1f,
+            rayStart,
             Vector3.down,
             groundCheckDistance
         );
+        
+        Debug.DrawRay(rayStart, Vector3.down * groundCheckDistance, isGrounded ? Color.green : Color.red);
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            jumpIntent = true;
         }
     }
 
@@ -45,9 +49,16 @@ public class PlayerMovement : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
         }
 
+        float currentVelocityY = rb.linearVelocity.y;
+        if (jumpIntent)
+        {
+            currentVelocityY = jumpForce;
+            jumpIntent = false;
+        }
+
         rb.linearVelocity = new Vector3(
             movement.x * speed,
-            rb.linearVelocity.y,
+            currentVelocityY,
             movement.z * speed
         );
 

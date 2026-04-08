@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class ShopItem : MonoBehaviour
 {
@@ -6,8 +7,22 @@ public class ShopItem : MonoBehaviour
     public string itemName = "Nueva Pieza";
     public int cost = 10;
     
+    [Header("Incrementos y UI")]
+    public float multiplicadorPrecio = 1.5f;
+    public TextMeshProUGUI textoPrecio;
+
     [Tooltip("El prefab 3D real de la pieza que el jugador va a comprar")]
     public GameObject piecePrefab;
+
+    private void Start()
+    {
+        ActualizarTextoPrecio();
+    }
+
+    private void ActualizarTextoPrecio()
+    {
+        if (textoPrecio != null) textoPrecio.text = cost.ToString();
+    }
 
     // Vincular este método al OnClick() de este mismo Button en el Inspector
     public void OnBuyClicked()
@@ -21,6 +36,10 @@ public class ShopItem : MonoBehaviour
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.AddPieceToInventory(piecePrefab, itemName);
+                
+                // 3. Aumentamos el precio y actualizamos UI
+                cost = Mathf.RoundToInt(cost * multiplicadorPrecio);
+                ActualizarTextoPrecio();
             }
             else
             {

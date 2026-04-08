@@ -105,6 +105,30 @@ public class InventoryManager : MonoBehaviour
         else if (cantidadIman <= 0) Debug.LogWarning("No quedan Imanes");
     }
 
+    public void ToggleTodosImanes()
+    {
+        // Buscamos todos los imanes en la escena
+        Magnet[] imanes = FindObjectsOfType<Magnet>();
+        
+        // Iteramos sobre todos y llamamos a la función de activar/desactivar
+        foreach(Magnet iman in imanes)
+        {
+            iman.cambiarFuerza();
+        }
+        
+        Debug.Log($"Se han activado/desactivado un total de {imanes.Length} imanes en la escena.");
+    }
+
+    public void EncenderTodosImanes()
+    {
+        Magnet[] imanes = FindObjectsOfType<Magnet>();
+        foreach(Magnet iman in imanes)
+        {
+            iman.activado = true;
+        }
+        Debug.Log($"Todos los imanes ({imanes.Length}) han sido encendidos para sincronizarse.");
+    }
+
     // --- FIN FUNCIONES ---
 
     // Botón StartGame desde el inventario, redirige al Manager del tiempo
