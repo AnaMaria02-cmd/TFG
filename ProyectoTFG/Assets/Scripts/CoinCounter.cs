@@ -1,5 +1,6 @@
 using UnityEngine;
-using TMPro; // Usamos TextMeshPro porque es el estándar moderno en Unity. Cámbiarlo a "using UnityEngine.UI" y "Text" si usas el clásico.
+using TMPro; 
+using System.Collections.Generic;
 
 public class CoinCounter : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class CoinCounter : MonoBehaviour
 
     // Variable interna para llevar la cuenta
     private int currentCoins = 0;
+    
+    // Rastrear monedas para no contarlas múltiples veces si rebotan
+    private HashSet<GameObject> countedCoins = new HashSet<GameObject>();
 
     private void Start()
     {
@@ -23,16 +27,20 @@ public class CoinCounter : MonoBehaviour
     // REQUISITO: Este objeto debe tener el Collider en modo "Is Trigger" marcado.
     private void OnTriggerEnter(Collider other)
     {
-        // Comprobar si el objeto que acaba de entrar tiene el tag que buscamos
+        // Comprobar si el objeto que acaba de entrar tiene el tag que buscamos y no ha sido contado antes
         if (other.CompareTag(coinTag))
         {
-            currentCoins++; // Sumamos una moneda a la cuenta
-            UpdateUI();     // Actualizamos el texto en pantalla
-            
-            // Opcional: si quieres que la moneda desaparezca al caer
-            // Destroy(other.gameObject); 
-            
-            Debug.Log($"¡Moneda recolectada! Total: {currentCoins}");
+            if (!countedCoins.Contains(other.gameObject))
+            {
+                countedCoins.Add(other.gameObject); // Lo marcamos como contado
+                currentCoins++; // Sumamos una moneda a la cuenta
+                UpdateUI();     // Actualizamos el texto en pantalla
+                
+                // Opcional: Limpiar referencias nulas de vez en cuando si se acumulan referenciando monedas borradas en rondas pasadas
+                if (countedCoins.Count > 500) countedCoins.RemoveWhere(c => c == null);
+                
+                Debug.Log($"¡Moneda recolectada! Total: {currentCoins}");
+            }
         }
     }
 
