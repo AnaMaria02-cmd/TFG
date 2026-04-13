@@ -15,6 +15,8 @@ public class DropAndDrag : MonoBehaviour
     bool isAttached = false;
     bool isSelected = false;
     Transform attachedNode;
+    
+    private DropAndDrag delegatedDrag = null; // Para rutear eventos a hijos (ej. Imán)
 
     private Plane dragPlane;
     private Camera cam;
@@ -54,6 +56,48 @@ public class DropAndDrag : MonoBehaviour
 
     private void OnMouseDown()
     {
+        delegatedDrag = null;
+
+        // 🔹 DELEGACIÓN INTELIGENTE DE CLICS
+        // Revisamos exactamente qué ha tocado el cursor para evitar que la pieza base 
+        // intercepte el clic que iba dirigido a una pieza hija (como un Imán) o a un socket ocupado.
+        Ray clickRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit[] hits = Physics.RaycastAll(clickRay);
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+        foreach (RaycastHit hit in hits)
+        {
+            // Si tocamos un socket nuestro que está ocupado:
+            Socket clickedSocket = hit.collider.GetComponent<Socket>();
+            if (clickedSocket != null && clickedSocket.transform.IsChildOf(this.transform) && clickedSocket.isOccupied)
+            {
+                DropAndDrag attachedPiece = clickedSocket.GetComponentInChildren<DropAndDrag>();
+                if (attachedPiece != null && attachedPiece != this)
+                {
+                    delegatedDrag = attachedPiece;
+                    delegatedDrag.ExecuteGrab();
+                    return; // Abortamos el agarre de la pieza base
+                }
+            }
+
+            // O si tocamos directamente el collider de una pieza hija conectada a nosotros:
+            DropAndDrag hitPiece = hit.collider.GetComponentInParent<DropAndDrag>();
+            if (hitPiece != null && hitPiece != this && hitPiece.transform.IsChildOf(this.transform))
+            {
+                delegatedDrag = hitPiece;
+                delegatedDrag.ExecuteGrab();
+                return;
+            }
+
+            // Si tocamos nuestro propio cuerpo primero, entonces queríamos agarrar esta pieza.
+            if (hitPiece == this) break;
+        }
+
+        ExecuteGrab();
+    }
+
+    public void ExecuteGrab()
+    {
         isSelected = true;
         IsDraggingAnyPiece = true; // Set flag
         SetHighlight(true); // Brillo al agarrar
@@ -89,10 +133,6 @@ public class DropAndDrag : MonoBehaviour
                 if (socketOwner != this)
                     continue;
 
-                // Comprobar con childCount > 0 (más fiable que isOccupied,
-                // que puede estar desincronizado). Si tiene hijos, significa
-                // que hay una pieza conectada → no desactivar para no apagar
-                // esa pieza (ej. pieza B) junto con el socket.
                 if (s.transform.childCount > 0 || s.isOccupied)
                     continue;
 
@@ -119,6 +159,18 @@ public class DropAndDrag : MonoBehaviour
 
     private void OnMouseDrag()
     {
+        if (delegatedDrag != null)
+        {
+            delegatedDrag.ExecuteDrag();
+            return;
+        }
+
+        ExecuteDrag();
+    }
+
+    public void ExecuteDrag()
+    {
+        if (!isSelected) return; 
         if (isAttached) return;
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -126,8 +178,6 @@ public class DropAndDrag : MonoBehaviour
 
         if (isPlayerMoving)
         {
-            // Mientras el jugador se mueve, bloqueamos la posición de la pieza en el mundo.
-            // Actualizamos el offset para que cuando se detenga el jugador, la pieza no dé un salto.
             if (dragPlane.Raycast(ray, out float d))
             {
                 mouseOffset = transform.position - ray.GetPoint(d);
@@ -145,6 +195,20 @@ public class DropAndDrag : MonoBehaviour
 
     private void OnMouseUp()
     {
+        if (delegatedDrag != null)
+        {
+            delegatedDrag.ExecuteUp();
+            delegatedDrag = null;
+            return;
+        }
+
+        ExecuteUp();
+    }
+
+    public void ExecuteUp()
+    {
+        if (!isSelected) return; 
+
         isSelected = false;
         IsDraggingAnyPiece = false; // Reset flag
         SetHighlight(false); // Quitar brillo al soltar
