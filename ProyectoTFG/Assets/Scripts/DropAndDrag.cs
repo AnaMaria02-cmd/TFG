@@ -294,9 +294,9 @@ public class DropAndDrag : MonoBehaviour
             // ✅ ORDEN CORRECTO: kinematic ANTES de SetParent
             if (rb != null)
             {
-                rb.isKinematic = true;
                 rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
+                rb.isKinematic = true;
             }
 
             // Guardar velocidad del padre (ej: jugador) antes del SetParent

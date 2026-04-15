@@ -513,6 +513,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 494014647822759809, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3149828200926591903}
+    - targetCorrespondingSourceObject: {fileID: 494014647822759809, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4609016596092571679}
     - targetCorrespondingSourceObject: {fileID: 6183400449119242101, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6503788650304157323}
@@ -751,6 +754,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bee8e2bdb793174480c12d18de1ee7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4609016596092571679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2052276870045006893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c17f5d6a4da3a244bb3aea531f6cd3ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attractionRadius: 8
+  attractionForce: 500
+  coinTag: Coin
+  capasAtraibles:
+    serializedVersion: 2
+    m_Bits: 4096
+  activado: 1
 --- !u!1 &3292999573465308747 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3968556304677557735, guid: a5f9c6400a5b60a42b211b3a1d7af4dd, type: 3}

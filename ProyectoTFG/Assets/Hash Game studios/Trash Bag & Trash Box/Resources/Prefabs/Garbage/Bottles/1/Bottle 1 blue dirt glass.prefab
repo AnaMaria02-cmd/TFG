@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 7063096461304169936}
   - component: {fileID: 2620874419875361441}
   - component: {fileID: 916490075608605545}
+  - component: {fileID: 2423470574765760869}
   m_Layer: 12
   m_Name: Bottle 1 blue dirt glass
   m_TagString: Coin
@@ -257,6 +258,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -6858852666998472530, guid: 0cea5fe9e1d991a4b963d5d177368563, type: 3}
+--- !u!54 &2423470574765760869
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7588275529957695338}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &8542171656092328142
 GameObject:
   m_ObjectHideFlags: 0

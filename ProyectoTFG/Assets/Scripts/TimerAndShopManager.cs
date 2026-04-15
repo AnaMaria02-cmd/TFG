@@ -26,6 +26,13 @@ public class TimerAndShopManager : MonoBehaviour
     public TextMeshProUGUI textoPrecioBlanda;
     public TextMeshProUGUI textoPrecioIman;
 
+    [Header("Avisos de la Tienda")]
+    [Tooltip("La Imagen del panel de aviso de 'Sin dinero' (arrastra aquí la imagen)")]
+    public UnityEngine.UI.Image panelAvisoDinero;
+    public float tiempoMostrarAviso = 1.5f;
+    public float tiempoFadeOut = 1f;
+    private Coroutine rutinaAvisoDinero;
+
     [Header("Configuración del Inventario")]
     public GameObject inventoryPanel; // Arrastrar el panel del Inventario (edición) aquí
     
@@ -152,7 +159,11 @@ public class TimerAndShopManager : MonoBehaviour
             }
             else Debug.LogWarning("¡Te falta el InventoryManager en tu escena para guardar la pieza!");
         }
-        else Debug.LogWarning("No tienes dinero suficiente para la Pieza Larga");
+        else 
+        {
+            Debug.LogWarning("No tienes dinero suficiente para la Pieza Larga");
+            MostrarAvisoDinero();
+        }
     }
 
     public void ComprarPiezaBlanda()
@@ -167,7 +178,11 @@ public class TimerAndShopManager : MonoBehaviour
             }
             else Debug.LogWarning("¡Te falta el InventoryManager en tu escena para guardar la pieza!");
         }
-        else Debug.LogWarning("No tienes dinero suficiente para la Pieza Blanda");
+        else 
+        {
+            Debug.LogWarning("No tienes dinero suficiente para la Pieza Blanda");
+            MostrarAvisoDinero();
+        }
     }
 
     public void ComprarIman()
@@ -182,7 +197,11 @@ public class TimerAndShopManager : MonoBehaviour
             }
             else Debug.LogWarning("¡Te falta el InventoryManager en tu escena para guardar la pieza!");
         }
-        else Debug.LogWarning("No tienes dinero suficiente para el Iman");
+        else 
+        {
+            Debug.LogWarning("No tienes dinero suficiente para el Iman");
+            MostrarAvisoDinero();
+        }
     }
 
     // Botón para cerrar la tienda y seguir jugando (opcional)
@@ -263,5 +282,45 @@ public class TimerAndShopManager : MonoBehaviour
         timeRemaining = 60f;
         isTimerRunning = true;
         Time.timeScale = 1f; // Asegurarse de que las físicas continúan su estado normal
+    }
+
+    // ── GESTIÓN DE AVISOS ──
+    private void MostrarAvisoDinero()
+    {
+        if (panelAvisoDinero != null)
+        {
+            if (rutinaAvisoDinero != null) StopCoroutine(rutinaAvisoDinero);
+            rutinaAvisoDinero = StartCoroutine(RutinaMostrarYDesvanecerAviso());
+        }
+        else
+        {
+            Debug.LogWarning("Configura el panelAvisoDinero en el Inspector para ver el mensaje en pantalla");
+        }
+    }
+
+    private System.Collections.IEnumerator RutinaMostrarYDesvanecerAviso()
+    {
+        // Mostrar de golpe
+        panelAvisoDinero.gameObject.SetActive(true);
+        Color colorFondo = panelAvisoDinero.color;
+        colorFondo.a = 1f;
+        panelAvisoDinero.color = colorFondo;
+
+        // Esperar (usamos WaitForSecondsRealtime porque el juego está pausado con timeScale = 0)
+        yield return new WaitForSecondsRealtime(tiempoMostrarAviso);
+
+        // Fade out (usamos unscaledDeltaTime por la misma razón)
+        float tiempo = 0f;
+        while (tiempo < tiempoFadeOut)
+        {
+            tiempo += Time.unscaledDeltaTime;
+            colorFondo.a = Mathf.Lerp(1f, 0f, tiempo / tiempoFadeOut);
+            panelAvisoDinero.color = colorFondo;
+            yield return null;
+        }
+
+        colorFondo.a = 0f;
+        panelAvisoDinero.color = colorFondo;
+        panelAvisoDinero.gameObject.SetActive(false);
     }
 }

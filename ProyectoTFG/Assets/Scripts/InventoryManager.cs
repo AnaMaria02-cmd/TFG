@@ -25,6 +25,13 @@ public class InventoryManager : MonoBehaviour
     [Header("Punto de Spawn")]
     public Transform spawnPoint;
 
+    [Header("Avisos del Inventario")]
+    [Tooltip("La Imagen del panel de aviso de 'No hay piezas' (arrastra aquí la imagen)")]
+    public UnityEngine.UI.Image panelAvisoPiezas;
+    public float tiempoMostrarAviso = 1.5f;
+    public float tiempoFadeOut = 1f;
+    private Coroutine rutinaAvisoPiezas;
+
     // Contadores internos
     private int cantidadLarga = 0;
     private int cantidadBlanda = 0;
@@ -78,7 +85,11 @@ public class InventoryManager : MonoBehaviour
             Instantiate(prefabLarga, pos, Quaternion.identity);
             ActualizarTextos();
         }
-        else if (cantidadLarga <= 0) Debug.LogWarning("No quedan Piezas Largas");
+        else if (cantidadLarga <= 0) 
+        {
+            Debug.LogWarning("No quedan Piezas Largas");
+            MostrarAvisoPiezas();
+        }
     }
 
     public void SpawnPiezaBlanda()
@@ -90,7 +101,11 @@ public class InventoryManager : MonoBehaviour
             Instantiate(prefabBlanda, pos, Quaternion.identity);
             ActualizarTextos();
         }
-        else if (cantidadBlanda <= 0) Debug.LogWarning("No quedan Piezas Blandas");
+        else if (cantidadBlanda <= 0) 
+        {
+            Debug.LogWarning("No quedan Piezas Blandas");
+            MostrarAvisoPiezas();
+        }
     }
 
     public void SpawnPiezaIman()
@@ -102,7 +117,11 @@ public class InventoryManager : MonoBehaviour
             Instantiate(prefabIman, pos, Quaternion.identity);
             ActualizarTextos();
         }
-        else if (cantidadIman <= 0) Debug.LogWarning("No quedan Imanes");
+        else if (cantidadIman <= 0) 
+        {
+            Debug.LogWarning("No quedan Imanes");
+            MostrarAvisoPiezas();
+        }
     }
 
     public void ToggleTodosImanes()
@@ -129,6 +148,26 @@ public class InventoryManager : MonoBehaviour
         Debug.Log($"Todos los imanes ({imanes.Length}) han sido encendidos para sincronizarse.");
     }
 
+    public void ToggleTodasPiezasBlandas()
+    {
+        BonePhysicsController[] piezasBlandas = FindObjectsOfType<BonePhysicsController>();
+        foreach (BonePhysicsController pieza in piezasBlandas)
+        {
+            pieza.AlternarFisicas();
+        }
+        Debug.Log($"Se han activado/desactivado las físicas de {piezasBlandas.Length} piezas blandas en la escena.");
+    }
+
+    public void ActivarTodasPiezasBlandas()
+    {
+        BonePhysicsController[] piezasBlandas = FindObjectsOfType<BonePhysicsController>();
+        foreach (BonePhysicsController pieza in piezasBlandas)
+        {
+            pieza.ActivarFisicas();
+        }
+        Debug.Log($"Se han ablandado {piezasBlandas.Length} piezas blandas en la escena.");
+    }
+
     // --- FIN FUNCIONES ---
 
     // Botón StartGame desde el inventario, redirige al Manager del tiempo
@@ -142,5 +181,45 @@ public class InventoryManager : MonoBehaviour
         {
             Debug.LogWarning("No se encontró el TimerAndShopManager en la escena");
         }
+    }
+
+    // ── GESTIÓN DE AVISOS ──
+    private void MostrarAvisoPiezas()
+    {
+        if (panelAvisoPiezas != null)
+        {
+            if (rutinaAvisoPiezas != null) StopCoroutine(rutinaAvisoPiezas);
+            rutinaAvisoPiezas = StartCoroutine(RutinaMostrarYDesvanecerAviso());
+        }
+        else
+        {
+            Debug.LogWarning("Configura el panelAvisoPiezas en el Inspector para ver el mensaje en pantalla");
+        }
+    }
+
+    private System.Collections.IEnumerator RutinaMostrarYDesvanecerAviso()
+    {
+        // Mostrar de golpe
+        panelAvisoPiezas.gameObject.SetActive(true);
+        Color colorFondo = panelAvisoPiezas.color;
+        colorFondo.a = 1f;
+        panelAvisoPiezas.color = colorFondo;
+
+        // Esperar
+        yield return new WaitForSecondsRealtime(tiempoMostrarAviso);
+
+        // Fade out
+        float tiempo = 0f;
+        while (tiempo < tiempoFadeOut)
+        {
+            tiempo += Time.unscaledDeltaTime;
+            colorFondo.a = Mathf.Lerp(1f, 0f, tiempo / tiempoFadeOut);
+            panelAvisoPiezas.color = colorFondo;
+            yield return null;
+        }
+
+        colorFondo.a = 0f;
+        panelAvisoPiezas.color = colorFondo;
+        panelAvisoPiezas.gameObject.SetActive(false);
     }
 }

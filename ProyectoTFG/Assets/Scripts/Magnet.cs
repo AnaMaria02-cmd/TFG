@@ -10,22 +10,31 @@ public class Magnet : MonoBehaviour
     public float attractionForce = 20f;
     [Tooltip("El tag que deben tener las monedas para ser afectadas.")]
     public string coinTag = "Coin";
+    [Tooltip("Selecciona aquí la capa (ej. 'lata') para que el imán solo atraiga esos objetos.")]
+    public LayerMask capasAtraibles = ~0; // ~0 significa "Todo" por defecto para no romper el script de golpe
     public bool activado = true;
 
     void FixedUpdate()
     {
         if (!activado) return;
 
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, attractionRadius);
+        // Utilizamos el layerMask aquí para que Unity solo detecte objetos en esa capa
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, attractionRadius, capasAtraibles);
         foreach (var hitCollider in hitColliders)
         {
-            // Comprobar si el objeto encontrado es una moneda según su Tag
-            if (hitCollider.CompareTag(coinTag))
-            {
-                Debug.Log("Moneda encontrada");
-                Rigidbody coinRb = hitCollider.GetComponent<Rigidbody>();
+            // Usar attachedRigidbody es más seguro por si el Rigidbody está en un padre
+            Rigidbody coinRb = hitCollider.attachedRigidbody; 
 
-                // Solo atraemos si tiene Rigidbody y no es cinemático (ya que si lo es, ya está pegado)
+            // Comprobar si el objeto o su rigidbody padre tienen el tag
+            bool hasTag = hitCollider.CompareTag(coinTag);
+            if (!hasTag && coinRb != null)
+            {
+                hasTag = coinRb.gameObject.CompareTag(coinTag);
+            }
+
+            if (hasTag)
+            {
+                // Solo atraemos si tiene Rigidbody y no es cinemático
                 if (coinRb != null && !coinRb.isKinematic)
                 {
                     Vector3 delta = transform.position - coinRb.transform.position;
@@ -51,19 +60,31 @@ public class Magnet : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag(coinTag))
+        // Comprobar primero que el objeto con el que colisiona esté en la capa correcta
+        bool isCorrectLayer = ((1 << collision.gameObject.layer) & capasAtraibles) != 0;
+
+        if (!isCorrectLayer) return;
+
+        Rigidbody coinRb = collision.rigidbody; 
+        bool hasTag = collision.gameObject.CompareTag(coinTag);
+        if (!hasTag && coinRb != null)
         {
-            Rigidbody coinRb = collision.gameObject.GetComponent<Rigidbody>();
+            hasTag = coinRb.gameObject.CompareTag(coinTag);
+        }
+
+        if (hasTag)
+        {
             if (coinRb != null)
             {
                 // Desactivar físicas en la moneda para que deje de moverse y se quede pegada
-                coinRb.isKinematic = true;
                 coinRb.linearVelocity = Vector3.zero;
                 coinRb.angularVelocity = Vector3.zero;
+                coinRb.isKinematic = true;
             }
 
-            // Hacer que la moneda sea hija del imán, así se moverá junto con él
-            collision.transform.SetParent(this.transform);
+            // Hacer que el objeto raíz sea hijo del imán
+            Transform rootToAttach = (coinRb != null) ? coinRb.transform : collision.transform;
+            rootToAttach.SetParent(this.transform);
         }
     }
 
@@ -96,13 +117,15 @@ public class Magnet : MonoBehaviour
         {
             Transform child = transform.GetChild(i);
             
-            if (child.CompareTag(coinTag))
+            Rigidbody childRb = child.GetComponent<Rigidbody>();
+            bool hasTag = child.CompareTag(coinTag);
+            
+            if (hasTag)
             {
                 child.SetParent(null);
-                Rigidbody rb = child.GetComponent<Rigidbody>();
-                if (rb != null)
+                if (childRb != null)
                 {
-                    rb.isKinematic = false;
+                    childRb.isKinematic = false;
                 }
             }
         }

@@ -141,6 +141,9 @@ MonoBehaviour:
   attractionRadius: 2
   attractionForce: 1000
   coinTag: Coin
+  capasAtraibles:
+    serializedVersion: 2
+    m_Bits: 2048
   activado: 1
 --- !u!114 &5780110665501729356
 MonoBehaviour:

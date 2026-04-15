@@ -3316,7 +3316,7 @@ MonoBehaviour:
       customPreviewImage: {fileID: 0}
     - name: Canned food 1 crumple red
       settings:
-        brushRadius: 1
+        brushRadius: 5.4
         brushSpacing: 0.5
         brushOverlapCheckMode: 0
         brushOverlapDistance: 0.5
@@ -3334,8 +3334,8 @@ MonoBehaviour:
         randomizeOrientationZ: 0
         scaleTransformMode: 0
         scaleMode: 0
-        scaleUniformMin: 1
-        scaleUniformMax: 1
+        scaleUniformMin: 6
+        scaleUniformMax: 6
         scalePerAxisMin: {x: 1, y: 1, z: 1}
         scalePerAxisMax: {x: 1, y: 1, z: 1}
         pinFixedRotation: 0
@@ -3631,7 +3631,7 @@ MonoBehaviour:
       customPreviewImage: {fileID: 0}
     - name: Bottle 2 crumple
       settings:
-        brushRadius: 1
+        brushRadius: 4.8
         brushSpacing: 0.5
         brushOverlapCheckMode: 0
         brushOverlapDistance: 0.5
@@ -3649,8 +3649,8 @@ MonoBehaviour:
         randomizeOrientationZ: 0
         scaleTransformMode: 0
         scaleMode: 0
-        scaleUniformMin: 1
-        scaleUniformMax: 1
+        scaleUniformMin: 6
+        scaleUniformMax: 6
         scalePerAxisMin: {x: 1, y: 1, z: 1}
         scalePerAxisMax: {x: 1, y: 1, z: 1}
         pinFixedRotation: 0
@@ -3946,7 +3946,7 @@ MonoBehaviour:
       customPreviewImage: {fileID: 0}
     - name: Bottle 1 blue dirt glass
       settings:
-        brushRadius: 1
+        brushRadius: 4.1
         brushSpacing: 0.5
         brushOverlapCheckMode: 0
         brushOverlapDistance: 0.5
@@ -3964,8 +3964,8 @@ MonoBehaviour:
         randomizeOrientationZ: 0
         scaleTransformMode: 0
         scaleMode: 0
-        scaleUniformMin: 1
-        scaleUniformMax: 1
+        scaleUniformMin: 6
+        scaleUniformMax: 6
         scalePerAxisMin: {x: 1, y: 1, z: 1}
         scalePerAxisMax: {x: 1, y: 1, z: 1}
         pinFixedRotation: 0
@@ -4576,7 +4576,7 @@ MonoBehaviour:
       customPreviewImage: {fileID: 0}
     - name: Pizza box 2
       settings:
-        brushRadius: 1
+        brushRadius: 5.1
         brushSpacing: 0.5
         brushOverlapCheckMode: 0
         brushOverlapDistance: 0.5
@@ -4594,8 +4594,8 @@ MonoBehaviour:
         randomizeOrientationZ: 0
         scaleTransformMode: 0
         scaleMode: 0
-        scaleUniformMin: 1
-        scaleUniformMax: 1
+        scaleUniformMin: 6
+        scaleUniformMax: 6
         scalePerAxisMin: {x: 1, y: 1, z: 1}
         scalePerAxisMax: {x: 1, y: 1, z: 1}
         pinFixedRotation: 0
@@ -4891,7 +4891,7 @@ MonoBehaviour:
       customPreviewImage: {fileID: 0}
     - name: Soda can 1 blue
       settings:
-        brushRadius: 1
+        brushRadius: 7.4
         brushSpacing: 0.5
         brushOverlapCheckMode: 0
         brushOverlapDistance: 0.5
@@ -4909,8 +4909,8 @@ MonoBehaviour:
         randomizeOrientationZ: 0
         scaleTransformMode: 0
         scaleMode: 0
-        scaleUniformMin: 1
-        scaleUniformMax: 1
+        scaleUniformMin: 6
+        scaleUniformMax: 6
         scalePerAxisMin: {x: 1, y: 1, z: 1}
         scalePerAxisMax: {x: 1, y: 1, z: 1}
         pinFixedRotation: 0
