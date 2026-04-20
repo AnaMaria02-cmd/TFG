@@ -12,10 +12,17 @@ public class CoinCounter : MonoBehaviour
     [Tooltip("Arrastra aquí el objeto de texto (TextMeshPro o Text) del Canvas que mostrará el contador")]
     public TextMeshProUGUI coinUIText; 
 
-    // Variable interna para llevar la cuenta
-    private int currentCoins = 0;
+    [Header("Efectos de Sonido")]
+    [Tooltip("Sonido que se reproducirá al recoger una lata/basura")]
+    public AudioClip sonidoLata;
+    [Tooltip("Sonido que se reproducirá al recoger un no conductor")]
+    public AudioClip sonidoNoConductor;
     
-    // Rastrear monedas para no contarlas múltiples veces si rebotan
+    [Tooltip("El tag para los objetos no conductores")]
+    public string nonConductorTag = "NoConductor";
+
+    // ... (rest of Start and vars same)
+    private int currentCoins = 0;
     private HashSet<GameObject> countedCoins = new HashSet<GameObject>();
 
     private void Start()
@@ -23,23 +30,41 @@ public class CoinCounter : MonoBehaviour
         UpdateUI();
     }
 
-    // Este método se llama automáticamente cuando otro objeto con Collider choca con este
-    // REQUISITO: Este objeto debe tener el Collider en modo "Is Trigger" marcado.
     private void OnTriggerEnter(Collider other)
     {
-        // Comprobar si el objeto que acaba de entrar tiene el tag que buscamos y no ha sido contado antes
+        // Comprobar si es lata (moneda)
         if (other.CompareTag(coinTag))
         {
             if (!countedCoins.Contains(other.gameObject))
             {
-                countedCoins.Add(other.gameObject); // Lo marcamos como contado
-                currentCoins++; // Sumamos una moneda a la cuenta
-                UpdateUI();     // Actualizamos el texto en pantalla
+                countedCoins.Add(other.gameObject); 
+                currentCoins++; 
+                UpdateUI();     
                 
-                // Opcional: Limpiar referencias nulas de vez en cuando si se acumulan referenciando monedas borradas en rondas pasadas
+                if (sonidoLata != null)
+                {
+                    AudioSource.PlayClipAtPoint(sonidoLata, transform.position);
+                }
+
                 if (countedCoins.Count > 500) countedCoins.RemoveWhere(c => c == null);
+            }
+        }
+        // Comprobar si es no conductor
+        else if (other.CompareTag(nonConductorTag))
+        {
+            if (!countedCoins.Contains(other.gameObject))
+            {
+                countedCoins.Add(other.gameObject); 
+                // Asumo que da puntos o no, aquí lo tratamos solo para sonido por si acaso
+                // currentCoins++; // Descomenta si también te da puntos
+                // UpdateUI();
                 
-                Debug.Log($"¡Moneda recolectada! Total: {currentCoins}");
+                if (sonidoNoConductor != null)
+                {
+                    AudioSource.PlayClipAtPoint(sonidoNoConductor, transform.position);
+                }
+
+                if (countedCoins.Count > 500) countedCoins.RemoveWhere(c => c == null);
             }
         }
     }

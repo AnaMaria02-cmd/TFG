@@ -105,8 +105,8 @@ public class DropAndDrag : MonoBehaviour
         // Al coger la pieza: kinematic para que no choque mientras se arrastra
         if (rb != null) rb.isKinematic = true;
 
-        // Plano que bloquea eje Z
-        dragPlane = new Plane(-cam.transform.forward, transform.position);
+        // Plano horizontal a altura 7 para bloquear el eje Y y permitir movimiento libre en X y Z
+        dragPlane = new Plane(Vector3.up, new Vector3(0, 7f, 0));
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (dragPlane.Raycast(ray, out float distance))

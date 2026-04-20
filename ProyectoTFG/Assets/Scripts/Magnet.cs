@@ -14,6 +14,8 @@ public class Magnet : MonoBehaviour
     public LayerMask capasAtraibles = ~0; // ~0 significa "Todo" por defecto para no romper el script de golpe
     public bool activado = true;
 
+    private List<GameObject> atraidas = new List<GameObject>();
+
     void FixedUpdate()
     {
         if (!activado) return;
@@ -76,14 +78,26 @@ public class Magnet : MonoBehaviour
         {
             if (coinRb != null)
             {
-                // Desactivar físicas en la moneda para que deje de moverse y se quede pegada
-                coinRb.linearVelocity = Vector3.zero;
-                coinRb.angularVelocity = Vector3.zero;
-                coinRb.isKinematic = true;
+                // EL TRUCO DEFINITIVO: Destruimos el Rigidbody mientras está pegado.
+                // Al no tener Rigidbody, la lata pasa a ser un simple modelo 3D (geometría visual),
+                // por lo que Unity no calculará NINGUNA física para ella y jamás saldrá volando por bugs de escala o rotación.
+                
+                Collider[] colliders = coinRb.GetComponentsInChildren<Collider>();
+                foreach(Collider col in colliders)
+                {
+                    col.enabled = false;
+                }
+
+                if (!atraidas.Contains(coinRb.gameObject))
+                {
+                    atraidas.Add(coinRb.gameObject);
+                }
+
+                Destroy(coinRb); // Eliminamos la física completamente
             }
 
             // Hacer que el objeto raíz sea hijo del imán
-            Transform rootToAttach = (coinRb != null) ? coinRb.transform : collision.transform;
+            Transform rootToAttach = collision.transform; 
             rootToAttach.SetParent(this.transform);
         }
     }
@@ -112,22 +126,31 @@ public class Magnet : MonoBehaviour
 
     private void SoltarMonedas()
     {
-        // Iteramos hacia atrás porque vamos a quitarles el parent
-        for (int i = transform.childCount - 1; i >= 0; i--)
+        foreach (GameObject obj in atraidas)
         {
-            Transform child = transform.GetChild(i);
-            
-            Rigidbody childRb = child.GetComponent<Rigidbody>();
-            bool hasTag = child.CompareTag(coinTag);
-            
-            if (hasTag)
+            if (obj != null)
             {
-                child.SetParent(null);
-                if (childRb != null)
+                obj.transform.SetParent(null);
+                
+                // Asegurarnos de encender sus colliders otra vez
+                Collider[] colliders = obj.GetComponentsInChildren<Collider>();
+                foreach(Collider col in colliders)
                 {
-                    childRb.isKinematic = false;
+                    col.enabled = true;
                 }
+
+                // Devolverle su Rigidbody para que vuelva a caer con las físicas normales
+                Rigidbody rbRestaurado = obj.GetComponent<Rigidbody>();
+                if (rbRestaurado == null)
+                {
+                    rbRestaurado = obj.AddComponent<Rigidbody>();
+                }
+                
+                rbRestaurado.isKinematic = false;
+                rbRestaurado.WakeUp();
             }
         }
+        
+        atraidas.Clear();
     }
 }

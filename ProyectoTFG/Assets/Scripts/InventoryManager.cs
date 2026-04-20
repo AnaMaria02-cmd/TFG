@@ -82,6 +82,7 @@ public class InventoryManager : MonoBehaviour
         {
             cantidadLarga--;
             Vector3 pos = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+            pos.y = 7f; // Forzar altura 7
             Instantiate(prefabLarga, pos, Quaternion.identity);
             ActualizarTextos();
         }
@@ -98,6 +99,7 @@ public class InventoryManager : MonoBehaviour
         {
             cantidadBlanda--;
             Vector3 pos = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+            pos.y = 7f; // Forzar altura 7
             Instantiate(prefabBlanda, pos, Quaternion.identity);
             ActualizarTextos();
         }
@@ -114,6 +116,7 @@ public class InventoryManager : MonoBehaviour
         {
             cantidadIman--;
             Vector3 pos = spawnPoint != null ? spawnPoint.position : Vector3.zero;
+            pos.y = 7f; // Forzar altura 7
             Instantiate(prefabIman, pos, Quaternion.identity);
             ActualizarTextos();
         }
