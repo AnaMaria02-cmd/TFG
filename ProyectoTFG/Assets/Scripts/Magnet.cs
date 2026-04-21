@@ -14,7 +14,33 @@ public class Magnet : MonoBehaviour
     public LayerMask capasAtraibles = ~0; // ~0 significa "Todo" por defecto para no romper el script de golpe
     public bool activado = true;
 
+    [Header("Sonido")]
+    [Tooltip("El sonido por defecto al atraer un objeto.")]
+    public AudioClip attachSound;
+    [Tooltip("El sonido si el objeto contiene 'Bottle' en su nombre.")]
+    public AudioClip bottleSound;
+    [Tooltip("El sonido si el objeto contiene 'Pizza' en su nombre.")]
+    public AudioClip pizzaSound;
+    [Tooltip("El sonido si el objeto contiene 'Paper' o 'Papel' en su nombre.")]
+    public AudioClip paperSound;
+    [Tooltip("Volumen del sonido (1 es el normal, puedes subirlo).")]
+    [Range(0f, 3f)]
+    public float attachVolume = 1f;
+    private AudioSource audioSource;
+
     private List<GameObject> atraidas = new List<GameObject>();
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        
+        // Hacemos que sea sonido 2D (0f) para que se escuche al máximo volumen sin importar lo lejos que esté la cámara
+        audioSource.spatialBlend = 0f; 
+    }
 
     void FixedUpdate()
     {
@@ -91,6 +117,33 @@ public class Magnet : MonoBehaviour
                 if (!atraidas.Contains(coinRb.gameObject))
                 {
                     atraidas.Add(coinRb.gameObject);
+
+                    if (audioSource != null)
+                    {
+                        AudioClip clipToPlay = attachSound; // Sonido por defecto
+
+                        // Comprobar el nombre del objeto para elegir el sonido
+                        string objectName = coinRb.gameObject.name;
+                        
+                        // Utilizamos Contains para que coincida aunque se llame "Bottle(Clone)"
+                        if (objectName.Contains("Bottle"))
+                        {
+                            if (bottleSound != null) clipToPlay = bottleSound;
+                        }
+                        else if (objectName.Contains("Pizza"))
+                        {
+                            if (pizzaSound != null) clipToPlay = pizzaSound;
+                        }
+                        else if (objectName.Contains("Paper") || objectName.Contains("Papel"))
+                        {
+                            if (paperSound != null) clipToPlay = paperSound;
+                        }
+
+                        if (clipToPlay != null)
+                        {
+                            audioSource.PlayOneShot(clipToPlay, attachVolume);
+                        }
+                    }
                 }
 
                 Destroy(coinRb); // Eliminamos la física completamente
