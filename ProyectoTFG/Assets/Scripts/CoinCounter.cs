@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro; 
+using System.Collections;
 using System.Collections.Generic;
 
 public class CoinCounter : MonoBehaviour
@@ -21,7 +22,15 @@ public class CoinCounter : MonoBehaviour
     [Tooltip("El tag para los objetos no conductores")]
     public string nonConductorTag = "NoConductor";
 
-    // ... (rest of Start and vars same)
+    [Header("Feedback Visual")]
+    [Tooltip("La luz que parpadeará al recoger un objeto")]
+    public Light feedbackLight;
+    [Tooltip("Intensidad máxima a la que llegará la luz")]
+    public float maxLightIntensity = 5f;
+    [Tooltip("Velocidad del parpadeo (fade in corto)")]
+    public float lightFadeSpeed = 15f;
+    private Coroutine flashCoroutine;
+
     private int currentCoins = 0;
     private HashSet<GameObject> countedCoins = new HashSet<GameObject>();
 
@@ -41,6 +50,8 @@ public class CoinCounter : MonoBehaviour
                 currentCoins++; 
                 UpdateUI();     
                 
+                TriggerLightFeedback();
+                
                 if (sonidoLata != null)
                 {
                     AudioSource.PlayClipAtPoint(sonidoLata, transform.position);
@@ -56,6 +67,9 @@ public class CoinCounter : MonoBehaviour
             if (!countedCoins.Contains(other.gameObject))
             {
                 countedCoins.Add(other.gameObject); 
+                
+                TriggerLightFeedback();
+
                 // Asumo que da puntos o no, aquí lo tratamos solo para sonido por si acaso
                 // currentCoins++; // Descomenta si también te da puntos
                 // UpdateUI();
@@ -89,6 +103,42 @@ public class CoinCounter : MonoBehaviour
         {
             coinUIText.text = "Monedas: " + currentCoins.ToString();
         }
+    }
+
+    private void TriggerLightFeedback()
+    {
+        if (feedbackLight != null)
+        {
+            if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+            flashCoroutine = StartCoroutine(FlashLight());
+        }
+    }
+
+    private IEnumerator FlashLight()
+    {
+        if (feedbackLight == null) yield break;
+
+        // Fase 1: Fade in muy rápido
+        float currentIntensity = feedbackLight.intensity;
+        while (currentIntensity < maxLightIntensity)
+        {
+            currentIntensity += Time.deltaTime * lightFadeSpeed * maxLightIntensity;
+            feedbackLight.intensity = currentIntensity;
+            yield return null;
+        }
+        feedbackLight.intensity = maxLightIntensity;
+
+        // Breve pausa arriba para que se note el flash
+        yield return new WaitForSeconds(0.05f);
+
+        // Fase 2: Fade out un poco más suave
+        while (currentIntensity > 0)
+        {
+            currentIntensity -= Time.deltaTime * lightFadeSpeed * maxLightIntensity * 0.5f;
+            feedbackLight.intensity = Mathf.Max(0, currentIntensity);
+            yield return null;
+        }
+        feedbackLight.intensity = 0f;
     }
 
     // ── MÉTODOS PÚBLICOS PARA LA TIENDA ──
