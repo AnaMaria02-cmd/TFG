@@ -45,6 +45,7 @@ public class CoinCounter : MonoBehaviour
                 {
                     AudioSource.PlayClipAtPoint(sonidoLata, transform.position);
                 }
+                Destroy(other.gameObject); // Destruir la lata para que desaparezca
 
                 if (countedCoins.Count > 500) countedCoins.RemoveWhere(c => c == null);
             }
@@ -63,6 +64,7 @@ public class CoinCounter : MonoBehaviour
                 {
                     AudioSource.PlayClipAtPoint(sonidoNoConductor, transform.position);
                 }
+                Destroy(other.gameObject); // Destruir el no conductor para que desaparezca
 
                 if (countedCoins.Count > 500) countedCoins.RemoveWhere(c => c == null);
             }

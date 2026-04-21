@@ -111,7 +111,8 @@ public class Magnet : MonoBehaviour
                 Collider[] colliders = coinRb.GetComponentsInChildren<Collider>();
                 foreach(Collider col in colliders)
                 {
-                    col.enabled = false;
+                    // Lo convertimos en Trigger en vez de apagarlo. Así la física no hace bugs, pero la caja invisible SÍ lo detecta.
+                    col.isTrigger = true;
                 }
 
                 if (!atraidas.Contains(coinRb.gameObject))
@@ -185,11 +186,11 @@ public class Magnet : MonoBehaviour
             {
                 obj.transform.SetParent(null);
                 
-                // Asegurarnos de encender sus colliders otra vez
+                // Asegurarnos de encender sus colliders otra vez (quitando el trigger)
                 Collider[] colliders = obj.GetComponentsInChildren<Collider>();
                 foreach(Collider col in colliders)
                 {
-                    col.enabled = true;
+                    col.isTrigger = false;
                 }
 
                 // Devolverle su Rigidbody para que vuelva a caer con las físicas normales
