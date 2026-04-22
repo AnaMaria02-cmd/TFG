@@ -129,6 +129,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   activado: 1
+  attachSound: {fileID: 8300000, guid: 8c73624efd429c74caf51128fe9b114c, type: 3}
+  bottleSound: {fileID: 0}
+  pizzaSound: {fileID: 0}
+  paperSound: {fileID: 0}
+  attachVolume: 1
 --- !u!114 &8973223112716628905
 MonoBehaviour:
   m_ObjectHideFlags: 0

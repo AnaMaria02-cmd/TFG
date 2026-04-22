@@ -165,7 +165,8 @@ MonoBehaviour:
   attachSound: {fileID: 8300000, guid: 8c73624efd429c74caf51128fe9b114c, type: 3}
   bottleSound: {fileID: 0}
   pizzaSound: {fileID: 0}
-  attachVolume: 1.63
+  paperSound: {fileID: 0}
+  attachVolume: 2.56
 --- !u!114 &8983014741166936304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,4 +235,5 @@ MonoBehaviour:
   attachSound: {fileID: 0}
   bottleSound: {fileID: 0}
   pizzaSound: {fileID: 0}
+  paperSound: {fileID: 0}
   attachVolume: 1
