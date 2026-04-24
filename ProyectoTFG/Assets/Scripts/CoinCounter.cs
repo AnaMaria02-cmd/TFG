@@ -13,6 +13,15 @@ public class CoinCounter : MonoBehaviour
     [Tooltip("Arrastra aquí el objeto de texto (TextMeshPro o Text) del Canvas que mostrará el contador")]
     public TextMeshProUGUI coinUIText; 
 
+    [Tooltip("Panel que se mostrará al ganar la partida")]
+    public GameObject victoryPanel;
+
+    [Tooltip("Cantidad de monedas necesarias para ganar")]
+    public int coinsToWin = 100;
+
+    [Tooltip("Nombre de la escena del menú inicial (para el botón de salir)")]
+    public string mainMenuSceneName = "MainMenu";
+
     [Header("Efectos de Sonido")]
     [Tooltip("Sonido que se reproducirá al recoger una lata/basura")]
     public AudioClip sonidoLata;
@@ -103,6 +112,17 @@ public class CoinCounter : MonoBehaviour
         {
             coinUIText.text = "Monedas: " + currentCoins.ToString();
         }
+
+        if (currentCoins >= coinsToWin)
+        {
+            if (victoryPanel != null && !victoryPanel.activeSelf)
+            {
+                victoryPanel.SetActive(true);
+                Time.timeScale = 0f; // Pausa el juego
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
     }
 
     private void TriggerLightFeedback()
@@ -155,5 +175,23 @@ public class CoinCounter : MonoBehaviour
             currentCoins -= amount;
             UpdateUI();
         }
+    }
+
+    // ── MÉTODOS PARA LOS BOTONES DE VICTORIA ──
+
+    public void RestartGame()
+    {
+        // Restablece el tiempo para que el juego no se quede pausado
+        Time.timeScale = 1f;
+        // Recarga la escena actual (restablece monedas, tiempo, todo en general)
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    public void GoToMainMenu()
+    {
+        // Restablece el tiempo
+        Time.timeScale = 1f;
+        // Carga la pantalla inicial (asegúrate de que esté en el Build Settings)
+        UnityEngine.SceneManagement.SceneManager.LoadScene(mainMenuSceneName);
     }
 }
