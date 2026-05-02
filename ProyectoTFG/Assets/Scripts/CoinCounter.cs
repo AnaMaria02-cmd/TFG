@@ -9,6 +9,10 @@ public class CoinCounter : MonoBehaviour
     [Tooltip("El tag que tienen tus monedas (por ejemplo: 'Coin', 'Moneda', etc.)")]
     public string coinTag = "Coin";
     
+    [Header("Mejoras de Tienda")]
+    [Tooltip("El multiplicador actual (1 por defecto, 2 si se compra la mejora)")]
+    public int coinMultiplier = 1;
+    
     [Header("Interfaz de Usuario (UI)")]
     [Tooltip("Arrastra aquí el objeto de texto (TextMeshPro o Text) del Canvas que mostrará el contador")]
     public TextMeshProUGUI coinUIText; 
@@ -56,7 +60,7 @@ public class CoinCounter : MonoBehaviour
             if (!countedCoins.Contains(other.gameObject))
             {
                 countedCoins.Add(other.gameObject); 
-                currentCoins++; 
+                currentCoins += coinMultiplier; 
                 UpdateUI();     
                 
                 TriggerLightFeedback();
@@ -113,15 +117,21 @@ public class CoinCounter : MonoBehaviour
             coinUIText.text = "Monedas: " + currentCoins.ToString();
         }
 
-        if (currentCoins >= coinsToWin)
+        // La victoria ahora se activa manualmente comprando en la tienda
+    }
+
+    public void TriggerVictory()
+    {
+        if (victoryPanel != null && !victoryPanel.activeSelf)
         {
-            if (victoryPanel != null && !victoryPanel.activeSelf)
-            {
-                victoryPanel.SetActive(true);
-                Time.timeScale = 0f; // Pausa el juego
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
-            }
+            victoryPanel.SetActive(true);
+            Time.timeScale = 0f; // Pausa el juego
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else if (victoryPanel == null)
+        {
+            Debug.LogWarning("¡Has ganado pero no hay panel de victoria asignado!");
         }
     }
 
@@ -175,6 +185,20 @@ public class CoinCounter : MonoBehaviour
             currentCoins -= amount;
             UpdateUI();
         }
+    }
+
+    public void EnableDoubleMoney()
+    {
+        // Puedes hacer que se acumule (coinMultiplier *= 2) o que se ponga fijo en 2 (coinMultiplier = 2)
+        // Por ahora lo ponemos en 2 como "ganar por dos"
+        coinMultiplier = 2;
+        Debug.Log("¡Multiplicador x2 Activado!");
+    }
+
+    public void ResetMultiplier()
+    {
+        coinMultiplier = 1;
+        Debug.Log("Multiplicador devuelto a x1");
     }
 
     // ── MÉTODOS PARA LOS BOTONES DE VICTORIA ──

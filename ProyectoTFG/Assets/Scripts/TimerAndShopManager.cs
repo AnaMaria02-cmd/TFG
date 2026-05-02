@@ -18,6 +18,21 @@ public class TimerAndShopManager : MonoBehaviour
     public int costeLarga = 5;
     public int costeBlanda = 8;
     public int costeIman = 20;
+    public int costeDobleDinero = 30;
+    
+    [Header("Mejora de Material")]
+    public int costeModificarMaterial = 50;
+    [Tooltip("El material que se va a modificar a todos los objetos a la vez")]
+    public Material materialAModificar;
+    public Color nuevoColorMaterial = Color.white;
+    [Tooltip("El nuevo Normal Map (arrastra la textura aquí)")]
+    public Texture nuevoNormalMap;
+    
+    [Header("Condición de Victoria")]
+    public int costeVictoria = 100;
+    
+    private Color colorOriginalMaterial;
+    private Texture normalMapOriginalMaterial;
 
     [Header("Incremento y UI de Precios")]
     [Tooltip("Por cuánto se multiplica el precio cada vez que compras")]
@@ -25,6 +40,9 @@ public class TimerAndShopManager : MonoBehaviour
     public TextMeshProUGUI textoPrecioLarga;
     public TextMeshProUGUI textoPrecioBlanda;
     public TextMeshProUGUI textoPrecioIman;
+    public TextMeshProUGUI textoPrecioDobleDinero;
+    public TextMeshProUGUI textoPrecioModificarMaterial;
+    public TextMeshProUGUI textoPrecioVictoria;
 
     [Header("Avisos de la Tienda")]
     [Tooltip("La Imagen del panel de aviso de 'Sin dinero' (arrastra aquí la imagen)")]
@@ -58,6 +76,13 @@ public class TimerAndShopManager : MonoBehaviour
 
     private void Start()
     {
+        // Guardar valores originales del material para revertirlos al final
+        if (materialAModificar != null)
+        {
+            colorOriginalMaterial = materialAModificar.color;
+            normalMapOriginalMaterial = materialAModificar.GetTexture("_BumpMap");
+        }
+
         // Asegurarnos de que la tienda empiece cerrada y el tiempo corra normal
         if (shopPanel != null) shopPanel.SetActive(false);
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
@@ -86,6 +111,12 @@ public class TimerAndShopManager : MonoBehaviour
                 if (InventoryManager.Instance != null) 
                 {
                     InventoryManager.Instance.EncenderTodosImanes();
+                }
+
+                // Reseteamos el multiplicador al acabar la ronda
+                if (coinCounter != null)
+                {
+                    coinCounter.ResetMultiplier();
                 }
 
                 OpenShop();
@@ -123,6 +154,9 @@ public class TimerAndShopManager : MonoBehaviour
         if (textoPrecioLarga != null) textoPrecioLarga.text = costeLarga.ToString();
         if (textoPrecioBlanda != null) textoPrecioBlanda.text = costeBlanda.ToString();
         if (textoPrecioIman != null) textoPrecioIman.text = costeIman.ToString();
+        if (textoPrecioDobleDinero != null) textoPrecioDobleDinero.text = costeDobleDinero.ToString();
+        if (textoPrecioModificarMaterial != null) textoPrecioModificarMaterial.text = costeModificarMaterial.ToString();
+        if (textoPrecioVictoria != null) textoPrecioVictoria.text = costeVictoria.ToString();
     }
 
     private void UpdateMoneyUI()
@@ -200,6 +234,79 @@ public class TimerAndShopManager : MonoBehaviour
         else 
         {
             Debug.LogWarning("No tienes dinero suficiente para el Iman");
+            MostrarAvisoDinero();
+        }
+    }
+
+    public void ComprarDobleDinero()
+    {
+        if (TrySpendMoney(costeDobleDinero))
+        {
+            if (coinCounter != null) 
+            {
+                coinCounter.EnableDoubleMoney();
+                costeDobleDinero = Mathf.RoundToInt(costeDobleDinero * multiplicadorPrecio);
+                ActualizarTextosPrecios();
+            }
+            else Debug.LogWarning("¡Te falta asignar CoinCounter en el TimerAndShopManager!");
+        }
+        else 
+        {
+            Debug.LogWarning("No tienes dinero suficiente para el Doble Dinero");
+            MostrarAvisoDinero();
+        }
+    }
+
+    public void ComprarMejoraMaterial()
+    {
+        if (TrySpendMoney(costeModificarMaterial))
+        {
+            if (materialAModificar != null)
+            {
+                // Cambiar el color base
+                materialAModificar.color = nuevoColorMaterial;
+                
+                // Cambiar el normal map si se ha asignado uno
+                if (nuevoNormalMap != null)
+                {
+                    materialAModificar.SetTexture("_BumpMap", nuevoNormalMap);
+                }
+                
+                costeModificarMaterial = Mathf.RoundToInt(costeModificarMaterial * multiplicadorPrecio);
+                ActualizarTextosPrecios();
+                Debug.Log("Material modificado para toda la partida actual.");
+            }
+            else
+            {
+                Debug.LogWarning("¡Falta asignar el materialAModificar en el Inspector!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No tienes dinero suficiente para modificar el material.");
+            MostrarAvisoDinero();
+        }
+    }
+
+    public void ComprarVictoria()
+    {
+        if (TrySpendMoney(costeVictoria))
+        {
+            if (coinCounter != null)
+            {
+                coinCounter.TriggerVictory();
+                
+                // Opcionalmente puedes desactivar la tienda aquí
+                if (shopPanel != null) shopPanel.SetActive(false);
+            }
+            else
+            {
+                Debug.LogWarning("¡Falta asignar CoinCounter en el TimerAndShopManager!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No tienes dinero suficiente para comprar la victoria.");
             MostrarAvisoDinero();
         }
     }
@@ -322,5 +429,16 @@ public class TimerAndShopManager : MonoBehaviour
         colorFondo.a = 0f;
         panelAvisoDinero.color = colorFondo;
         panelAvisoDinero.gameObject.SetActive(false);
+    }
+
+    // Asegurarse de devolver el material a la normalidad al salir del juego o reiniciar la escena
+    private void OnDestroy()
+    {
+        if (materialAModificar != null)
+        {
+            materialAModificar.color = colorOriginalMaterial;
+            // "_BumpMap" es el nombre interno de la propiedad Normal Map en la mayoría de shaders de Unity
+            materialAModificar.SetTexture("_BumpMap", normalMapOriginalMaterial); 
+        }
     }
 }

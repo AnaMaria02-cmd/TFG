@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Inicio.unity
     guid: d440e67ec99a6db4e80bf5325ad25407
   - enabled: 1
-    path: Assets/Scenes/Puzle2.unity
+    path: Assets/Scenes/tutorial.unity
     guid: c57086b3fd8e88b439f04a9cafc1ee7a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
