@@ -468,6 +468,47 @@ public class DropAndDrag : MonoBehaviour
         }
     }
 
+    public void ForceAttachToSocket(Socket socket)
+    {
+        if (socket == null) return;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+
+        transform.SetParent(socket.transform, true);
+        socket.isOccupied = true;
+        attachedNode = socket.transform;
+        isAttached = true;
+
+        // Configurar joints de física (como cuerdas)
+        Rigidbody targetRb = socket.GetComponentInParent<Rigidbody>();
+        if (targetRb != null)
+        {
+            CharacterJoint cj = GetComponent<CharacterJoint>();
+            if (cj != null)
+            {
+                cj.autoConfigureConnectedAnchor = true;
+                cj.connectedBody = targetRb;
+            }
+        }
+
+        // Activar los sockets propios de esta pieza
+        Socket[] childSockets = GetComponentsInChildren<Socket>(true);
+        foreach (Socket s in childSockets)
+        {
+            DropAndDrag socketOwner = s.GetComponentInParent<DropAndDrag>();
+            if (socketOwner != this)
+                continue;
+
+            s.gameObject.SetActive(true);
+            s.isOccupied = false;
+        }
+    }
+
     private void SetHighlight(bool enable)
     {
         if (renderers == null) return;

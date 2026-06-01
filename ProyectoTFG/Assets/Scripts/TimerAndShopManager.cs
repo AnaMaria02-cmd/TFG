@@ -6,7 +6,7 @@ public class TimerAndShopManager : MonoBehaviour
     public static TimerAndShopManager Instance;
 
     [Header("Configuración del Tiempo")]
-    public float timeRemaining = 60f; // 1 minuto
+    public float timeRemaining = 10; // 1 minuto
     public TextMeshProUGUI timerText; // Arrastrar el Texto del Cronómetro aquí
     private bool isTimerRunning = true;
 
@@ -86,10 +86,24 @@ public class TimerAndShopManager : MonoBehaviour
         // Asegurarnos de que la tienda empiece cerrada y el tiempo corra normal
         if (shopPanel != null) shopPanel.SetActive(false);
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
-        Time.timeScale = 1f; 
         
         // Al empezar la partida también spawneamos las pelotas la primera vez
         SpawnearPelotas();
+
+        // Verificar si se solicitó cargar una partida guardada
+        bool cargarPartida = PlayerPrefs.GetInt("CargarPartidaGuardada", 0) == 1;
+        if (cargarPartida)
+        {
+            PlayerPrefs.SetInt("CargarPartidaGuardada", 0);
+            SaveManager.LoadGame();
+            Time.timeScale = 1f;
+            isTimerRunning = true;
+        }
+        else
+        {
+            Time.timeScale = 1f; 
+            isTimerRunning = true;
+        }
     }
 
     private void Update()
@@ -429,6 +443,29 @@ public class TimerAndShopManager : MonoBehaviour
         colorFondo.a = 0f;
         panelAvisoDinero.color = colorFondo;
         panelAvisoDinero.gameObject.SetActive(false);
+    }
+
+    public void LoadShopData(int cLarga, int cBlanda, int cIman, int cDoble, int cMaterial, int cVictoria, float timeRem, bool materialModificado)
+    {
+        costeLarga = cLarga;
+        costeBlanda = cBlanda;
+        costeIman = cIman;
+        costeDobleDinero = cDoble;
+        costeModificarMaterial = cMaterial;
+        costeVictoria = cVictoria;
+        timeRemaining = timeRem;
+
+        if (materialModificado && materialAModificar != null)
+        {
+            materialAModificar.color = nuevoColorMaterial;
+            if (nuevoNormalMap != null)
+            {
+                materialAModificar.SetTexture("_BumpMap", nuevoNormalMap);
+            }
+        }
+
+        ActualizarTextosPrecios();
+        UpdateTimerUI();
     }
 
     // Asegurarse de devolver el material a la normalidad al salir del juego o reiniciar la escena

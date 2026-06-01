@@ -80,6 +80,13 @@ public class PauseMenu : MonoBehaviour
         if (pausePanel != null) pausePanel.SetActive(true); // Volver al panel de pausa
     }
 
+    // Asignar al botón "Guardar partida"
+    public void GuardarPartida()
+    {
+        SaveManager.SaveGame();
+        // Opcional: Podríamos reanudar el juego o mostrar un mensaje visual de guardado.
+    }
+
     // Asignar al botón "Salir al menú"
     public void GoToMainMenu()
     {

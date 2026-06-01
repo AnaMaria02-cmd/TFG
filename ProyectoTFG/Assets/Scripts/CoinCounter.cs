@@ -55,7 +55,7 @@ public class CoinCounter : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Comprobar si es lata (moneda)
-        if (other.CompareTag(coinTag))
+        if (other.gameObject.tag == coinTag)
         {
             if (!countedCoins.Contains(other.gameObject))
             {
@@ -75,7 +75,7 @@ public class CoinCounter : MonoBehaviour
             }
         }
         // Comprobar si es no conductor
-        else if (other.CompareTag(nonConductorTag))
+        else if (other.gameObject.tag == nonConductorTag)
         {
             if (!countedCoins.Contains(other.gameObject))
             {
@@ -176,6 +176,13 @@ public class CoinCounter : MonoBehaviour
     public int GetCurrentCoins()
     {
         return currentCoins;
+    }
+
+    public void LoadCoinsData(int coins, int multiplier)
+    {
+        this.currentCoins = coins;
+        this.coinMultiplier = multiplier;
+        UpdateUI();
     }
 
     public void SpendCoins(int amount)

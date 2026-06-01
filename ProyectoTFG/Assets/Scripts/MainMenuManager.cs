@@ -13,6 +13,10 @@ public class MainMenuManager : MonoBehaviour
     [Tooltip("Asigna aquí el Panel de Puzles desde el Inspector")]
     public GameObject panelPuzles;
 
+    [Header("UI Partida Guardada")]
+    [Tooltip("Asigna aquí el botón de Continuar para poder desactivarlo si no hay partida guardada")]
+    public Button botonContinuar;
+
     [Header("Controles")]
     [Tooltip("Asigna aquí el Scrollbar que controla el volumen")]
     public Scrollbar scrollbarSonido;
@@ -34,6 +38,12 @@ public class MainMenuManager : MonoBehaviour
             // Añadimos el listener para que cada vez que se mueva el scrollbar, se llame al método CambiarVolumen
             scrollbarSonido.onValueChanged.AddListener(CambiarVolumen);
         }
+
+        // Desactivar el botón Continuar si no hay partida guardada
+        if (botonContinuar != null)
+        {
+            botonContinuar.interactable = SaveManager.HasSavedGame();
+        }
     }
 
     // =========== MÉTODOS PARA LOS BOTONES PRINCIPALES ===========
@@ -41,9 +51,19 @@ public class MainMenuManager : MonoBehaviour
     // Función a asignar al "Botón de jugar"
     public void Jugar()
     {
-        // Usualmente carga la siguiente escena en el Build Index (o puedes poner el nombre de la escena, ej: "Nivel1")
-        // SceneManager.LoadScene("NombreDeTuEscenaPrincipal");
+        // Empezamos una partida nueva
+        PlayerPrefs.SetInt("CargarPartidaGuardada", 0);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    // Función a asignar al "Botón de continuar"
+    public void ContinuarPartida()
+    {
+        if (SaveManager.HasSavedGame())
+        {
+            PlayerPrefs.SetInt("CargarPartidaGuardada", 1);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
     }
 
     // Función a asignar al "Botón de ajustes"

@@ -37,6 +37,18 @@ public class InventoryManager : MonoBehaviour
     private int cantidadBlanda = 0;
     private int cantidadIman = 0;
 
+    public int GetCantidadLarga() => cantidadLarga;
+    public int GetCantidadBlanda() => cantidadBlanda;
+    public int GetCantidadIman() => cantidadIman;
+
+    public void LoadInventoryData(int larga, int blanda, int iman)
+    {
+        cantidadLarga = larga;
+        cantidadBlanda = blanda;
+        cantidadIman = iman;
+        ActualizarTextos();
+    }
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
