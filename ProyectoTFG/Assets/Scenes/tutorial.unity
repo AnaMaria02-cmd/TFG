@@ -1904,7 +1904,6 @@ GameObject:
   - component: {fileID: 168914152}
   - component: {fileID: 168914151}
   - component: {fileID: 168914150}
-  - component: {fileID: 168914149}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -1928,30 +1927,6 @@ Transform:
   - {fileID: 1999179407}
   m_Father: {fileID: 1311700588}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &168914149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 168914147}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8b79b70bf5e794409e3f168937b5335, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coinTag: Coin
-  coinMultiplier: 1
-  coinUIText: {fileID: 1983697115}
-  victoryPanel: {fileID: 0}
-  coinsToWin: 100
-  mainMenuSceneName: MainMenu
-  sonidoLata: {fileID: 8300000, guid: 50613d493edfc014297a5d618292a614, type: 3}
-  sonidoNoConductor: {fileID: 8300000, guid: 213bc43bffbf65141b0c1a5baa1983b2, type: 3}
-  nonConductorTag: NoConductor
-  feedbackLight: {fileID: 0}
-  maxLightIntensity: 5
-  lightFadeSpeed: 15
 --- !u!65 &168914150
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4633,9 +4608,7 @@ GameObject:
   - component: {fileID: 466077124}
   - component: {fileID: 466077126}
   - component: {fileID: 466077127}
-  - component: {fileID: 466077128}
   - component: {fileID: 466077129}
-  - component: {fileID: 466077130}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -4682,7 +4655,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 571c1c5b96dbb82498f64fb57e70bfeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeRemaining: 60
+  timeRemaining: 10
   timerText: {fileID: 1034357780}
   shopPanel: {fileID: 1873475722}
   moneyText: {fileID: 687848167}
@@ -4690,11 +4663,11 @@ MonoBehaviour:
   costeBlanda: 8
   costeIman: 20
   costeDobleDinero: 30
-  costeModificarMaterial: 50
+  costeModificarMaterial: 0
   materialAModificar: {fileID: 2100000, guid: 6736d3d84b4287a4489a72e3a16703a4, type: 2}
   nuevoColorMaterial: {r: 0.97735846, g: 0.6693983, b: 0.6992129, a: 1}
   nuevoNormalMap: {fileID: 2800000, guid: 449f6fe2da22077469b00565af68e90c, type: 3}
-  costeVictoria: 100
+  costeVictoria: 0
   multiplicadorPrecio: 1.5
   textoPrecioLarga: {fileID: 2017403564}
   textoPrecioBlanda: {fileID: 823402225}
@@ -4706,7 +4679,7 @@ MonoBehaviour:
   tiempoMostrarAviso: 0.7
   tiempoFadeOut: 0.7
   inventoryPanel: {fileID: 1343959606}
-  prefabPelotasEscenario: {fileID: 562705285172880841, guid: ed9a4c9b7b770be4cb904546b9aa6e18, type: 3}
+  prefabPelotasEscenario: {fileID: 307667617573722226, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
   jugadorTransform: {fileID: 1889957003}
   jugadorSpawnPoint: {fileID: 341332167}
   coinCounter: {fileID: 682032729}
@@ -4735,21 +4708,6 @@ MonoBehaviour:
   panelAvisoPiezas: {fileID: 701566756}
   tiempoMostrarAviso: 0.7
   tiempoFadeOut: 0.7
---- !u!114 &466077128
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 466077123}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17a19054d2eb8d14f90b422a932341d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pausePanel: {fileID: 0}
-  instructionsPanel: {fileID: 270327795}
-  mainMenuSceneName: Inicio
 --- !u!114 &466077129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4764,22 +4722,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel1: {fileID: 1435982747}
   panel2: {fileID: 1945982467}
---- !u!114 &466077130
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 466077123}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 832b9bbe2dac80b42803d3518a4c3aa4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  panelAjustes: {fileID: 0}
-  panelPuzles: {fileID: 0}
-  botonContinuar: {fileID: 0}
-  scrollbarSonido: {fileID: 0}
 --- !u!1 &467693158
 GameObject:
   m_ObjectHideFlags: 0
@@ -18377,6 +18319,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 12cfb2088e4bbbf4fbe0fdb1adb20190, type: 3}
+--- !u!1001 &9117340653672245354
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 307667617573722226, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_Name
+      value: Latas tutorial
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3095336132292916508, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 87b89d3d19aa7974facc2c441c361f26, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -18404,3 +18403,4 @@ SceneRoots:
   - {fileID: 1326384573}
   - {fileID: 517339146}
   - {fileID: 1230412957}
+  - {fileID: 9117340653672245354}

@@ -38,6 +38,30 @@ public static class SaveManager
         return PlayerPrefs.GetInt(KEY_HAS_SAVE, 0) == 1;
     }
 
+    // Filtra si un GameObject con DropAndDrag es una pieza real individual o un sub-objeto de un prefab de pieza
+    private static bool IsRealPiece(DropAndDrag piece)
+    {
+        if (piece == null) return false;
+
+        // Si no tiene padre con DropAndDrag en su jerarquía, es una pieza raíz real
+        DropAndDrag parentPiece = piece.transform.parent != null ? piece.transform.parent.GetComponentInParent<DropAndDrag>() : null;
+        if (parentPiece == null)
+        {
+            return true;
+        }
+
+        // Si tiene un padre DropAndDrag, para ser una pieza acoplada real distinta,
+        // debe estar conectada a través de un objeto con el componente Socket.
+        if (piece.transform.parent != null && piece.transform.parent.GetComponent<Socket>() != null)
+        {
+            return true;
+        }
+
+        // Si tiene un padre DropAndDrag pero no está conectado a un Socket,
+        // significa que es un sub-componente interno del propio prefab de la pieza (ej. un Cube hijo del Imán)
+        return false;
+    }
+
     public static void SaveGame()
     {
         Debug.Log("Iniciando guardado de partida...");
@@ -45,11 +69,15 @@ public static class SaveManager
         // Guardamos que existe una partida
         PlayerPrefs.SetInt(KEY_HAS_SAVE, 1);
 
-        // 1. Guardar Monedas y Multiplicador
-        CoinCounter coins = Object.FindObjectOfType<CoinCounter>();
-        if (coins == null && TimerAndShopManager.Instance != null)
+        // 1. Obtener CoinCounter (Priorizando la referencia asignada en el inspector de TimerAndShopManager)
+        CoinCounter coins = null;
+        if (TimerAndShopManager.Instance != null)
         {
             coins = TimerAndShopManager.Instance.coinCounter;
+        }
+        if (coins == null)
+        {
+            coins = Object.FindObjectOfType<CoinCounter>();
         }
 
         if (coins != null)
@@ -57,7 +85,7 @@ public static class SaveManager
             int currentCoins = coins.GetCurrentCoins();
             PlayerPrefs.SetInt(KEY_COINS, currentCoins);
             PlayerPrefs.SetInt(KEY_MULTIPLIER, coins.coinMultiplier);
-            Debug.Log($"Monedas guardadas: {currentCoins}, Multiplicador: {coins.coinMultiplier}");
+            Debug.Log($"Monedas guardadas: {currentCoins}, Multiplicador: {coins.coinMultiplier} (Leído de {coins.gameObject.name})");
         }
         else
         {
@@ -167,9 +195,18 @@ public static class SaveManager
         Debug.Log($"Basura guardada: {activeTrashPositions.Count} objetos activos.");
 
         // 6. Guardar Piezas Colocadas en el Escenario y sus conexiones
-        DropAndDrag[] allPieces = Object.FindObjectsOfType<DropAndDrag>();
-        PlayerPrefs.SetInt("Save_PiecesCount", allPieces.Length);
-        for (int i = 0; i < allPieces.Length; i++)
+        DropAndDrag[] allPiecesRaw = Object.FindObjectsOfType<DropAndDrag>();
+        List<DropAndDrag> allPieces = new List<DropAndDrag>();
+        foreach (var p in allPiecesRaw)
+        {
+            if (IsRealPiece(p))
+            {
+                allPieces.Add(p);
+            }
+        }
+
+        PlayerPrefs.SetInt("Save_PiecesCount", allPieces.Count);
+        for (int i = 0; i < allPieces.Count; i++)
         {
             DropAndDrag piece = allPieces[i];
 
@@ -220,7 +257,7 @@ public static class SaveManager
                     int parentIndex = -1;
                     if (parentPiece != null)
                     {
-                        parentIndex = System.Array.IndexOf(allPieces, parentPiece);
+                        parentIndex = allPieces.IndexOf(parentPiece);
                     }
 
                     if (parentIndex != -1)
@@ -235,7 +272,7 @@ public static class SaveManager
                 }
             }
         }
-        Debug.Log($"Piezas de robot guardadas: {allPieces.Length} piezas.");
+        Debug.Log($"Piezas de robot guardadas: {allPieces.Count} piezas reales.");
 
         PlayerPrefs.Save();
         Debug.Log("¡Partida Guardada Exitosamente!");
@@ -251,11 +288,15 @@ public static class SaveManager
 
         Debug.Log("Iniciando carga de partida...");
 
-        // 1. Cargar Monedas y Multiplicador
-        CoinCounter coins = Object.FindObjectOfType<CoinCounter>();
-        if (coins == null && TimerAndShopManager.Instance != null)
+        // 1. Obtener CoinCounter (Priorizando la referencia asignada en el inspector de TimerAndShopManager)
+        CoinCounter coins = null;
+        if (TimerAndShopManager.Instance != null)
         {
             coins = TimerAndShopManager.Instance.coinCounter;
+        }
+        if (coins == null)
+        {
+            coins = Object.FindObjectOfType<CoinCounter>();
         }
 
         if (coins != null)
@@ -263,7 +304,7 @@ public static class SaveManager
             int loadedCoins = PlayerPrefs.GetInt(KEY_COINS, 0);
             int loadedMultiplier = PlayerPrefs.GetInt(KEY_MULTIPLIER, 1);
             coins.LoadCoinsData(loadedCoins, loadedMultiplier);
-            Debug.Log($"Monedas cargadas: {loadedCoins}, Multiplicador: {loadedMultiplier}");
+            Debug.Log($"Monedas cargadas: {loadedCoins}, Multiplicador: {loadedMultiplier} (Cargado en {coins.gameObject.name})");
         }
         else
         {
@@ -397,9 +438,11 @@ public static class SaveManager
 
         // 6. Cargar y Reconstruir Piezas de Robot en la escena
         // Destruimos primero las piezas actuales en la escena para no duplicarlas
-        DropAndDrag[] currentPieces = Object.FindObjectsOfType<DropAndDrag>();
-        foreach (var p in currentPieces)
+        DropAndDrag[] currentPiecesRaw = Object.FindObjectsOfType<DropAndDrag>();
+        foreach (var p in currentPiecesRaw)
         {
+            if (!IsRealPiece(p)) continue; // Solo procesamos piezas raíces para evitar destruir hijos de forma redundante
+
             if (p.transform.parent != null)
             {
                 Socket s = p.transform.parent.GetComponent<Socket>();
